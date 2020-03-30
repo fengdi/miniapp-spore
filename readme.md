@@ -1,4 +1,4 @@
-# 小程序框架aliapp #
+# 小程序框架miniapp-spore #
 
 ## 前言 ##
 
