@@ -1,4 +1,4 @@
-# 小程序框架aliapp #
+# 小程序框架miniapp-spore #
 
 ## 前言 ##
 
@@ -56,7 +56,7 @@ Page({
     data:{
         numA: 5,
         numB: 3,
-        count(){    //支持方法
+        count(){    //支持计算方法
             return this.numA + this.numB;
         }
     }
@@ -172,7 +172,7 @@ Component({
 ```
 
 
-注意：一旦你准备在一个页面或者组件中使用update方法，请不要使用setData $spliceData等方法 !!!
+注意：一旦你准备在一个页面或者组件中使用update方法，请不要使用setData $spliceData方法 !!!
 
 ### `pageInstance.$splice(data, callback)` ###
 
@@ -194,7 +194,7 @@ Page({
   <input onBlur="linkData" onInput="linkData" data-linkkey="input" value="{{input}}">
 </view>
 ```
-注意：不要主动去调用方法，仅用于模板内事件绑定。
+注意：不要主动去调用此方法，仅用于模板内事件绑定。
 
 
 ## 组件配置 ##
