@@ -1,26 +1,25 @@
 import cloud from "@tbmp/mp-cloud-sdk";
-// import { isArray } from 'util';
 
 export default (config) => {
     // console.log("config", config);
 
     cloud.init({
-        // env: 'test'
-        env: config.env, //'online'
+        // env: 'test' //'online'
+        env: config.env,
     });
 
+    //云函数简化版 1 
+    //用法 fn(云函数, 数据, 函数名)
     const fn = cloud.function.invoke.bind(cloud.function);
 
-    let sysInfo = null; //系统信息缓存
-    let icssData = {}; //icss缓存
-
-    //云函数简化版
+    //云函数简化版 2
+    //用法 await f(`${云函数.函数名}`, 数据)
+    // f("winonaLachineCms.appletEntrance", data)
     const f = (name, data) => {
         return fn.apply(cloud.function, name.split(".").splice(1, 0, data));
     };
-    // await f(`${云函数.函数名}`, 数据)
-    // f("winonaLachineCms.appletEntrance", data)
 
+    
     //简化系统提示信息
     const toast = function (str) {
         my.showToast({
@@ -178,10 +177,12 @@ export default (config) => {
                 (t = console).log.apply(t, arguments);
         }.apply(void 0, i);
     };
+    
+    let sysInfo = null; //系统信息缓存
+    let icssData = {}; //icss缓存
+    let activityId = ""; //活动id
 
-    let activityId = "";
-
-    return {
+    let apis = {
         cloud,
         f,
         fn,
@@ -194,101 +195,6 @@ export default (config) => {
         setActivityId(id) {
             activityId = id;
         },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#HQKPt
-        // 小程序入口
-        async enter() {
-            return fetchData(await fn("user", {}, "enter"));
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#iVicW
-        // 用户任务完成
-        async task(data) {
-            // console.log("任务", data)
-            data = data || {
-                type: "",
-                mold: "",
-                reason: "",
-                subscribe: "",
-            };
-            return await fn("user", data, "task");
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#nmfdK
-        // 填写城市
-        async city(city = "") {
-            return await fn("user", { city }, "city");
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#zmkMg
-        // 开始游戏,会扣一次游戏次数
-        async playing() {
-            return await fn("user", {}, "playing");
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#jrBVb
-        // 游戏提醒,会扣一次游戏提醒次数
-        async remind() {
-            return await fn("user", {}, "remind");
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#Fk6rt
-        // 结算游戏分数
-        async score(score = 0, level = "level1") {
-            return await fn("user", { score, level }, "score");
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#1au1e
-        // 我的奖品
-        async prize() {
-            return fetchData(await fn("user", {}, "prize"));
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#eQs7h
-        // 提交领奖信息
-        async info(info, type = "score") {
-            // info.wangwang
-            // info.tel
-            // info.addr
-            // type  score | rank
-            return fetchData(await fn("user", { info, type }, "info"));
-        },
-        async chance() {
-            return await fn("user", {}, "user");
-        },
-        async rank() {
-            return fetchData(await fn("user", {}, "rank"));
-        },
-        async reason() {
-            return fetchData(await fn("user", {}, "reason"));
-        },
-        async numScore() {
-            return fetchData(await fn("user", {}, "numScore"));
-        },
-        async numUser() {
-            let startDatetime = "2020-03-10 00:00:00";
-            let endDatetime = "2030-12-25 00:00:00";
-            return await fn(
-                "spm",
-                { type: "view", startDatetime, endDatetime },
-                "disUser"
-            );
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#sG04c
-        // 行为次数统计
-        async spmCount(type = "view") {
-            let startDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
-            let endDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
-
-            return fetchMessage(
-                await fn(
-                    "spm",
-                    { type, startDatetime, endDatetime },
-                    "spmCount"
-                )
-            );
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#AQryx
-        // 人数统计
-        // async disUser(type="view"){
-        //     let startDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
-        //     let endDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
-
-        //     return fetchMessage(await fn("spm", {type, startDatetime, endDatetime}, "disUser"));
-        // },
-
         //自定义样式
         async icss(page = "index") {
             return icssData[page]
@@ -358,8 +264,9 @@ export default (config) => {
                 )
             );
         },
+        //收藏店铺
         favorShop(id) {
-            id = parseInt(id);
+            id = parseInt(id || config.shop.sellerId);
             return new Promise(function (resolve, reject) {
                 my.tb.favorShop({
                     id,
@@ -383,6 +290,26 @@ export default (config) => {
                     },
                 });
             });
+        },
+        /**
+         * 跳到会员页面
+         * page   {[String]} 回调返回页面，字符串 "pages/index/index" 默认值 pages/index/index
+         * params {[Object]} 页面带的参数，对象，在page的onLoad方法query中获取 默认值 {}
+         */
+        async tobeMember(page, params={}){
+
+            let memberUrl = `https://market.m.taobao.com/app/sj/shop-membership-center/pages/index?wh_weex=true&sellerId=${config.shop.sellerId}&extraInfo=%7B%22source%22%3A%22isvapp%22%2C%22activityId%22%3A%22miniapp%22%2C%22entrance%22%3A%22hudong%22%7D&callbackUrl=`;
+
+            page = page ? page : 'pages/index/index';
+
+            let base = config.appUrl;
+
+            let query = apis.query(params||{});
+
+            let backUrl = `${base}&page=${page}?` + encodeURIComponent( `${query}`);
+
+            apis.jump(`${memberUrl}${encodeURIComponent(backUrl)}`);
+
         },
         // 页面跳转 url自动外跳
         jump(url) {
@@ -428,5 +355,53 @@ export default (config) => {
         // params(query){
         //   return Object.fromEntries(query.split("&").map(p=>p.split('=')));
         // }
+
+
+        //============================= 以下为项目云函数配置 ====================================
+        /**
+         * 在每个云函数 配好文档地址（带哈希路径的）
+         * 可以利用的方法  f fn fetchData fetchMessage
+         * 下面是例子：（可以删除）
+         */
+        
+        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#iVicW
+        // 用户任务完成
+        async task(data) {
+            // console.log("任务", data)
+            data = data || {
+                type: "",
+                mold: "",
+                reason: "",
+                subscribe: "",
+            };
+            //直接返回云函数结构体
+            return await fn("user", data, "task");
+            //或者 return await f("user.task", data); //注：字符串.区分
+        },
+        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#HQKPt
+        // 小程序入口
+        async enter() {
+            //取data数据
+            return fetchData(await fn("user", {}, "enter"));
+        },
+        
+        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#sG04c
+        // 行为次数统计
+        async spmCount(type = "view") {
+            let startDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
+            let endDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
+            //取成功状态 
+            return fetchMessage(
+                await fn(
+                    "spm",
+                    { type, startDatetime, endDatetime },
+                    "spmCount"
+                )
+            );
+        }
+
+
     };
+
+    return apis;
 };
