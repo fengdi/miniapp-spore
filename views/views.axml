@@ -1,0 +1,3 @@
+
+<!-- <view>下面是路由视图</view> -->
+<slot view="{{current}}" name="{{path}}"/>

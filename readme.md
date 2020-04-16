@@ -2,7 +2,7 @@
 
 ## 前言 ##
 
-之前，我尝试直接用taro remax rax等开发小程序，其实开发效率和性能都可以达标的，只有一个开发体验问题，每次保存文件，框架先编译之后小程序开发工具检测文件修改再进行一次编译，两次编译时间比较长，至少达到5秒。另外还有一个问题是，在window开发遇到编译报错原因是编译的时候小程序开发工具也在同时编译改动文件导致文件无法覆盖和保存。因此，退一步在原生基础上搞一套框架出来，这套框架是无感知、渐进增强框架，在保留原来写法上新增语法方法特性。
+之前，我尝试直接用taro remax rax等开发小程序，其实开发效率和性能都可以达标的，只有一个开发体验问题，每次保存文件，框架先编译之后小程序开发工具检测文件修改再进行一次编译，两次编译时间比较长，至少达到5秒。另外还有一个问题是，在window开发遇到编译报错原因是编译的时候小程序开发工具也在同时编译改动文件导致文件无法覆盖和保存。因此，退一步在原生基础上搞一套框架出来，这套框架是无感知、渐进增强框架，在保留原来写法上新增语法方法和特性。
 
 ## 安装 ##
 
@@ -12,8 +12,39 @@
 
 `app.js`文件头部你需要加这两行代码，框架就开始运作了
 ```javascript
-import aliapp from "./npm/aliapp";
-aliapp.init();
+import app from "./npm/app";
+let apis = app({//config
+  env:"test",    //当前环境 test | online ，切换环境这个字段必改，
+  envs:{
+    //根据上面env判断对应配置，并深度合并到config
+    "test":{
+        //测试环境的配置
+        appUrl:"https://m.duanqu.com?_ariver_appid=3000000003651171&nbsv=0.1.2004151741.2&nbsource=debug&nbsn=DEBUG",
+    },
+    "online":{
+        //正式环境的配置
+        appUrl:"https://m.duanqu.com?_ariver_appid=3000000003651171"
+    }
+  },
+  //其它配置信息
+  shop:{
+    shopId: "106564654",
+    sellerId:"1818112088",
+  },
+});
+
+//apis 是在 npm/apis.js 中配置的接口函数里面有 云函数 和 工具函数
+// apis.config 为配置信息（根据环境会自动切换）
+// 云函数也会根据环境自动切换 
+//apis可以放入到App配置中如：
+App({
+  apis,//页面和组件 可以获取  let apis = getApp().apis;
+  onLaunch(options) {
+  },
+  onShow(options) {
+  },
+  //...
+});
 ```
 
 
@@ -188,6 +219,21 @@ Page({
 用法参考页面的linkData
 
 
+## 接口云函数库apis.js ##
+
+**根据每个项目云函数，自行在apis.js内修改添加函数配置信息，在页面和组件内调用**
+
+根据前面在App初始化后，页面和组件可以获取到apis
+
+```javascript
+let apis = getApp().apis;
+
+
+let data = await apis.enter();
+
+
+```
+
 
 
 ## 模板JS工具函数 tpl-utils.sjs ##
@@ -200,5 +246,10 @@ Page({
 {{util.json(foo)}}
 
 ```
-
 具体有哪些函数，看源码吧🙂
+
+## views视图历史组件 ##
+
+位置在 `npm/views` 里面有文档
+
+
