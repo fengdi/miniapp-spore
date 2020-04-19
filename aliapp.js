@@ -15,18 +15,18 @@ const type = (t)=>{
 }
 
 let isIDE = false;
-
+let debug = false;
 
 let warn = (...msg)=>{
-    if(isIDE){
+    if(isIDE && debug){
         console.warn(...msg);
     }
-}
+};
 let log = (...msg)=>{
-    if(isIDE){
+    if(isIDE && debug){
         console.log(...msg);
     }
-}
+};
 
 
 
@@ -217,6 +217,7 @@ function updateComputed() {
 const init = (option)=>{
 
     isIDE = option.isIDE;
+    debug = 'debug'in option? option.debug : true;
 
     App = function(config){
 
@@ -320,6 +321,7 @@ const init = (option)=>{
 export default {
     mix,
     init,
+    diff,
     deepCopy: diff.deepCopy,
     type,
     log,

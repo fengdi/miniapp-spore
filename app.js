@@ -5,7 +5,7 @@ export default (config = {}) => {
     let envConfig = (config.envs || {})[config.env] || {};
     delete config.envs;
     config = aliapp.mix(config, envConfig);
-    let isIDE = (config.isIDE = my.isIDE);
+    let isIDE = config.isIDE = my.isIDE;
 
     aliapp.init(config);
     let apifns = apis(config);
