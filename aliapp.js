@@ -326,6 +326,7 @@ const init = (option)=>{
 export default {
     mix,
     init,
+    diff,
     deepCopy: diff.deepCopy,
     type,
     log,

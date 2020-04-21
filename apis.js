@@ -16,7 +16,9 @@ export default (config) => {
     //用法 await f(`${云函数.函数名}`, 数据)
     // f("winonaLachineCms.appletEntrance", data)
     const f = (name, data) => {
-        return fn.apply(cloud.function, name.split(".").splice(1, 0, data));
+        let args = name.split(".");
+            args.splice(1, 0, data);
+        return fn.apply(cloud.function, args);
     };
 
     
@@ -201,7 +203,7 @@ export default (config) => {
                 ? icssData[page]
                 : (icssData[page] = await fn("icss", {}, page));
         },
-
+        //授权
         authorize() {
             return new Promise(function (resolve, reject) {
                 my.authorize({
@@ -216,6 +218,7 @@ export default (config) => {
                 });
             });
         },
+        //用户信息
         getUserInfo() {
             return new Promise(function (resolve, reject) {
                 my.getAuthUserInfo({
@@ -228,6 +231,7 @@ export default (config) => {
                 });
             });
         },
+        //系统信息
         getSystemInfo() {
             //做了缓存
             return sysInfo ? sysInfo : (sysInfo = my.getSystemInfoSync());
@@ -246,6 +250,7 @@ export default (config) => {
                 });
             });
         },
+        //数组版检查收藏商品状态
         checkCollectItems(ids = []) {
             return Promise.all(
                 ids.map(
@@ -279,6 +284,7 @@ export default (config) => {
                 });
             });
         },
+        //唤起分享栏
         shareApp() {
             return new Promise(function (resolve, reject) {
                 my.showSharePanel({
@@ -292,21 +298,29 @@ export default (config) => {
             });
         },
         /**
-         * 跳到会员页面
+         * 生成app页面地址默认pages/index/index
          * page   {[String]} 回调返回页面，字符串 "pages/index/index" 默认值 pages/index/index
          * params {[Object]} 页面带的参数，对象，在page的onLoad方法query中获取 默认值 {}
          */
-        async tobeMember(page, params={}){
-
-            let memberUrl = `https://market.m.taobao.com/app/sj/shop-membership-center/pages/index?wh_weex=true&sellerId=${config.shop.sellerId}&extraInfo=%7B%22source%22%3A%22isvapp%22%2C%22activityId%22%3A%22miniapp%22%2C%22entrance%22%3A%22hudong%22%7D&callbackUrl=`;
-
+        getAppUrl(page, params = {}){
             page = page ? page : 'pages/index/index';
 
             let base = config.appUrl;
 
-            let query = apis.query(params||{});
+            let query = apis.query(params || {});
 
-            let backUrl = `${base}&page=${page}?` + encodeURIComponent( `${query}`);
+            return `${base}&page=${page}?` + encodeURIComponent(`${query}`);
+        },
+        /**
+         * 跳到会员页面
+         * page   {[String]} 回调返回页面，字符串 "pages/index/index" 默认值 pages/index/index
+         * params {[Object]} 页面带的参数，对象，在page的onLoad方法query中获取 默认值 {}
+         */
+        async tobeMember(page, params = {}) {
+
+            let memberUrl = `https://market.m.taobao.com/app/sj/shop-membership-center/pages/index?wh_weex=true&sellerId=${config.shop.sellerId}&extraInfo=%7B%22source%22%3A%22isvapp%22%2C%22activityId%22%3A%22miniapp%22%2C%22entrance%22%3A%22hudong%22%7D&callbackUrl=`;
+
+            let backUrl = apis.getAppUrl(page, params);
 
             apis.jump(`${memberUrl}${encodeURIComponent(backUrl)}`);
 
@@ -330,7 +344,7 @@ export default (config) => {
                 }
             });
         },
-        // {"foo":"bar", id:"213"}  => foo=bar&id=213
+        //对象转url参数 {"foo":"bar", id:"213"}  => foo=bar&id=213
         query(params) {
             params = params || {};
             params.id = activityId;
@@ -338,7 +352,10 @@ export default (config) => {
                 .map((k) => `${k}=${params[k]}`)
                 .join("&");
         },
-
+        // url参数转对象
+        // params(query){
+        //   return Object.fromEntries(query.split("&").map(p=>p.split('=')));
+        // }
         //获取云存储URL，数组顺序对应，查不到返回空字符串
         async cloudFile(urls = []) {
             urls = Array.isArray(urls) ? urls : [urls];
@@ -352,9 +369,6 @@ export default (config) => {
 
             return urls.map((url) => map[url] || "");
         },
-        // params(query){
-        //   return Object.fromEntries(query.split("&").map(p=>p.split('=')));
-        // }
 
 
         //============================= 以下为项目云函数配置 ====================================
@@ -382,7 +396,7 @@ export default (config) => {
         // 小程序入口
         async enter() {
             //取data数据
-            return fetchData(await fn("user", {}, "enter"));
+            return fetchData(await f("user.enter", {}));
         },
         
         // https://www.yuque.com/ggikb6/lggvwh/zumgyf#sG04c
@@ -392,11 +406,7 @@ export default (config) => {
             let endDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
             //取成功状态 
             return fetchMessage(
-                await fn(
-                    "spm",
-                    { type, startDatetime, endDatetime },
-                    "spmCount"
-                )
+                await f("spm.spmCount",{ type, startDatetime, endDatetime })
             );
         }
 

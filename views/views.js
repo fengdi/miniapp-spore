@@ -1,4 +1,3 @@
-
 Component({
     mixins: [],
     data: {
@@ -23,28 +22,31 @@ Component({
             this.props.onRef.call(this, this);
         }
         this._init();
-        
     },
     didUpdate(prev) {
         //检测props.default变化 重新初始化默认页
-        if(JSON.stringify(this.props.default) != JSON.stringify(prev.default)){
+        if (
+            JSON.stringify(this.props.default) != JSON.stringify(prev.default)
+        ) {
             this._init();
         }
     },
     didUnmount() {},
     methods: {
-        _init(){
+        _init() {
             if (this.props.default && this.props.default.path) {
-                if(!this.data.histroy.length){
+                if (!this.data.histroy.length) {
                     this.push(this.props.default);
-                }else{
+                } else {
                     //最后一个历史是第一个覆盖掉
-                    this.data.histroy[this.data.histroy.length-1] = this.props.default;
+                    this.data.histroy[
+                        this.data.histroy.length - 1
+                    ] = this.props.default;
                     this.update();
                 }
             }
         },
-        push(data, emitChange=true) {
+        push(data, emitChange = true) {
             if (!data) {
                 console.warn('需要添加历史信息,{path:"",state:{}}');
                 return false;
@@ -55,23 +57,21 @@ Component({
                 }
                 data.state = data.state || {};
                 this.data.histroy.unshift(data);
-                
+
                 this.update({}, () => {
                     emitChange && this.props.onChange.call(this, data);
-
-                    console.log(this.data)
                 });
             }
         },
-        reset(data, emitChange=true){
+        reset(data, emitChange = true) {
             this.data.histroy = [];
-            if(data){
+            if (data) {
                 this.push(data, emitChange);
-            }else{
+            } else {
                 this.update();
             }
         },
-        canBack(){
+        canBack() {
             return this.data.histroy.length > 1;
         },
         back() {
@@ -83,6 +83,6 @@ Component({
             } else {
                 console.warn("不能back, 已是最后一个历史记录");
             }
-        }
+        },
     },
 });

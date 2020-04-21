@@ -1,8 +1,10 @@
-# 小程序框架miniapp-spore #
+# 阿里小程序渐进框架 miniapp-spore #
 
 ## 前言 ##
 
-之前，我尝试直接用taro remax rax等开发小程序，其实开发效率和性能都可以达标的，只有一个开发体验问题，每次保存文件，框架先编译之后小程序开发工具检测文件修改再进行一次编译，两次编译时间比较长，至少达到5秒。另外还有一个问题是，在windows开发遇到编译报错原因是编译的时候小程序开发工具也在同时编译改动文件导致文件无法覆盖和保存。因此，退一步在原生基础上搞一套框架出来，这套框架是无感知、渐进增强框架，在保留原来写法上新增语法方法和特性。
+之前，我尝试直接用taro remax rax等开发小程序，其实开发效率和性能都可以达标的。我也更推荐用react开发小程序，之前有项目用remax和rax做过。其实只有两个开发体验上的问题，其一每次保存文件，框架先编译之后小程序开发工具检测文件修改再进行一次编译，两次编译时间比较长，至少达到5秒。另外还有一个问题是，在windows开发遇到编译报错原因是编译的时候小程序开发工具也在同时编译改动文件导致文件无法覆盖和保存。
+
+因此，退一步在原生基础上搞一套框架出来，这套框架是无感知、渐进增强框架，在保留原来写法上新增语法方法和特性，包容原生页面组件生态，在新项目使用框架可以引入之前原生写的组件，同时以前的维护项目可以无缝引入框架。
 
 ## 安装 ##
 
@@ -11,6 +13,14 @@
 ## 初始化 ##
 
 `app.js`文件头部你需要加这两行代码，框架就开始运作了
+```javascript
+import app from "./npm/app";
+let apis = app({
+    env:'test'
+});
+```
+下面是完整的app.js文件示例
+
 ```javascript
 import app from "./npm/app";
 let apis = app({//config
@@ -26,6 +36,7 @@ let apis = app({//config
         appUrl:"https://m.duanqu.com?_ariver_appid=3000000003651171"
     }
   },
+  debug: false,//是否开启框架内的log调试信息
   //其它配置信息
   shop:{
     shopId: "106564654",
@@ -117,7 +128,7 @@ Page({
 
 ### `pageInstance.update(data, callback)` ###
 更新data数据。
-首先，方法性能优化版的原生setData，作为原生setData的替代方案。提供了两种使用方式，用更容易理解的方式更新数据。
+首先，方法性能优化版的原生setData，作为原生setData的替代方案。其次提供了两种使用方式，用更容易理解的方式更新数据。
 
 方式一，直接修改data，最后update：
 ```javascript
@@ -223,14 +234,23 @@ Page({
 
 **根据每个项目云函数，自行在apis.js内修改添加函数配置信息，在页面和组件内调用**
 
-根据前面在App初始化后，页面和组件可以获取到apis
+根据前面在App初始化后，页面和组件可以获取到apis，
+apis内有常用的封装好的工具函数，也有需要提前自行配置好的云函数。
 
 ```javascript
 let apis = getApp().apis;
 
+//比如:
 
+//工具函数，支持跳转外链/页面
+apis.jump('https://m.taobao.com');
+
+//调用apis内配置好的云函数，可以统一处理好参数和返回值，页面组件重用
 let data = await apis.enter();
 
+//直接调用云函数 `云函数.函数名` 提交数据
+let res = await apis.f('user.enter', {foo:'bar'})
+//等同于 cloud.function.invoke('user', {foo:'bar'}, 'enter');
 
 ```
 
