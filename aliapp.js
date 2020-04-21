@@ -15,18 +15,18 @@ const type = (t)=>{
 }
 
 let isIDE = false;
-
+let debug = false;
 
 let warn = (...msg)=>{
-    if(isIDE){
+    if(isIDE && debug){
         console.warn(...msg);
     }
-}
+};
 let log = (...msg)=>{
-    if(isIDE){
+    if(isIDE && debug){
         console.log(...msg);
     }
-}
+};
 
 
 
@@ -98,7 +98,6 @@ let initThrottle = (config, isComponent=false ) =>{
 }
 
 const setOldData = function(){
-    updateComputed.call(this);
     this._oldData = diff.deepCopy(this.data)//JSON.parse(JSON.stringify(this.data));
 };
 const getOldData = function(){
@@ -138,7 +137,6 @@ const update = function (data, callback){
     let type = ('$viewId' in this) ? 'Page' : 'Component';
 
     data = data || {};
-    updateComputed.call(this);
     //newDataArray分为
     //newDataArray[0]  为纯粹的键值更新 比如： "foo" : "bar"
     //newDataArray[1]  路径更新 更新   比如： "a.b.c[0].d.e" : "zoo"
@@ -148,20 +146,24 @@ const update = function (data, callback){
     // console.log("newDataArray", newDataArray)
     const update = diff(newDataArray[0], this._getOldData());
 
-    // console.log(update)
-    // delete update.path;
-    log(`[update${type}Data]:`, update, newDataArray[1]);
+    // log(`[update${type}Data]:`, update, newDataArray[1]);
+    log(`[update${type}Data]:`, Object.assign(update, newDataArray[1]));
     this._setOldData();
-    this.setData(Object.assign(update, newDataArray[1]), callback)
+    this.setData(Object.assign(update, newDataArray[1]), (data)=>{
+        updateComputed.call(this)
+        callback && callback.call(this, data);
+    })
 }
 const merge = function(mergedata, callback){
-    console.log(this.data, mergedata)
     mix(this.data, mergedata||{});
     this.update({}, callback);
 };
-const $splice = function(){
+const $splice = function(data, callback){
     this._setOldData();
-    this.$spliceData.apply(this, arguments);
+    this.$spliceData(data, (data)=>{
+        updateComputed.call(this)
+        callback && callback.call(this, data);
+    });
 };
 const linkData = function(e){
     let self = this;
@@ -205,9 +207,8 @@ function setComputed(storeData, value, obj, key) {
   }
 }
 
-//更新计算方法，每次setData前更新了一次，因为setData后data中的getter会被过滤掉
+//更新计算方法，每次setData更新了一次，因为setData后data中的getter会被过滤掉
 function updateComputed() {
-    let data = this.data;
     let computeds = this._computeds;
     mix(this.data, this._computeds);
     setComputed(this.data, this.data);
@@ -217,6 +218,7 @@ function updateComputed() {
 const init = (option)=>{
 
     isIDE = option.isIDE;
+    debug = 'debug'in option? option.debug : true;
 
     App = function(config){
 
@@ -242,6 +244,8 @@ const init = (option)=>{
 
             self._computeds = computedFnwalk(this.data);
 
+            updateComputed.call(this);
+            
             self._setOldData()
             // const setData = self.setData;
             // self.setData = function(){
@@ -291,6 +295,8 @@ const init = (option)=>{
             });
             
             self._computeds = computedFnwalk(this.data);
+
+            updateComputed.call(this);
 
             this._setOldData();
             // console.log(self);
