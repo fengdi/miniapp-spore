@@ -154,7 +154,7 @@ export default (config) => {
     };
 
     // 开发者工具打印信息
-    // env({title:"",content:" "})
+    // env({title:"",content:" ",backgroundColor:""})
     let env = function (t) {
         //#42c02e 绿
         //#1475b2 蓝
@@ -175,11 +175,11 @@ export default (config) => {
         return function () {
             var t;
             console &&
-                "function" === typeof console.log &&
-                (t = console).log.apply(t, arguments);
+            "function" === typeof console.log &&
+            (t = console).log.apply(t, arguments);
         }.apply(void 0, i);
     };
-    
+
     let sysInfo = null; //系统信息缓存
     let icssData = {}; //icss缓存
     let activityId = ""; //活动id
@@ -194,6 +194,11 @@ export default (config) => {
         dateFormat,
         randomByWeights,
         shuffle,
+        alert(str){
+            my.alert({
+                content: str
+            });
+        },
         setActivityId(id) {
             activityId = id;
         },
@@ -235,6 +240,58 @@ export default (config) => {
         getSystemInfo() {
             //做了缓存
             return sysInfo ? sysInfo : (sysInfo = my.getSystemInfoSync());
+        },
+        //打开商品页
+        openItem(id) {
+            // return new Promise(function (resolve, reject) {
+            //     my.tb.openDetail({
+            //         itemId: id,
+            //         success: (res) => {
+            //             resolve(res);
+            //         },
+            //         fail: (res) => {
+            //             reject(res);
+            //         },
+            //     });
+            // });
+            apis.jump(`https://detail.m.tmall.com/item.htm?id=${id}`);
+        },
+        getAppInfo(){
+
+            let sysData = my.getSystemInfoSync();
+
+            let height = 750*sysData.screenHeight/sysData.screenWidth;;
+
+            let appInfo = {
+                height:height,
+                headerHeight:176,
+                platform:sysData.platform
+            }
+
+            if(height <= 1350){
+                appInfo.type = "minPage";
+                appInfo.headerHeight = 132;
+                appInfo.appType = 'pagemin'
+
+            }else{
+                appInfo.type = "maxPage";
+                appInfo.headerHeight=176;
+                appInfo.appType = 'pagemax'
+            }
+
+            appInfo.platform = appInfo.platform.toLowerCase()
+
+
+            if(appInfo.platform&&appInfo.platform.toLowerCase()=='android'){
+                appInfo.headerHeight=150;
+            }
+
+            let result = {
+                success:true,
+                data:appInfo
+            }
+
+            return result;
         },
         //收藏商品
         collectItem(id) {
@@ -311,6 +368,10 @@ export default (config) => {
 
             return `${base}&page=${page}?` + encodeURIComponent(`${query}`);
         },
+        //生成分享链接
+        getShareUrl(page, shareQuery = {}) {
+            return apis.getAppUrl(page, shareQuery);
+        },
         /**
          * 跳到会员页面
          * page   {[String]} 回调返回页面，字符串 "pages/index/index" 默认值 pages/index/index
@@ -347,7 +408,7 @@ export default (config) => {
         //对象转url参数 {"foo":"bar", id:"213"}  => foo=bar&id=213
         query(params) {
             params = params || {};
-            params.id = activityId;
+            // params.id = activityId;
             return Object.keys(params)
                 .map((k) => `${k}=${params[k]}`)
                 .join("&");
@@ -356,6 +417,7 @@ export default (config) => {
         // params(query){
         //   return Object.fromEntries(query.split("&").map(p=>p.split('=')));
         // }
+
         //获取云存储URL，数组顺序对应，查不到返回空字符串
         async cloudFile(urls = []) {
             urls = Array.isArray(urls) ? urls : [urls];
@@ -371,44 +433,6 @@ export default (config) => {
         },
 
 
-        //============================= 以下为项目云函数配置 ====================================
-        /**
-         * 在每个云函数 配好文档地址（带哈希路径的）
-         * 可以利用的方法  f fn fetchData fetchMessage
-         * 下面是例子：（可以删除）
-         */
-        
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#iVicW
-        // 用户任务完成
-        async task(data) {
-            // console.log("任务", data)
-            data = data || {
-                type: "",
-                mold: "",
-                reason: "",
-                subscribe: "",
-            };
-            //直接返回云函数结构体
-            return await fn("user", data, "task");
-            //或者 return await f("user.task", data); //注：字符串.区分
-        },
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#HQKPt
-        // 小程序入口
-        async enter() {
-            //取data数据
-            return fetchData(await f("user.enter", {}));
-        },
-        
-        // https://www.yuque.com/ggikb6/lggvwh/zumgyf#sG04c
-        // 行为次数统计
-        async spmCount(type = "view") {
-            let startDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
-            let endDatetime = dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss");
-            //取成功状态 
-            return fetchMessage(
-                await f("spm.spmCount",{ type, startDatetime, endDatetime })
-            );
-        }
 
 
     };

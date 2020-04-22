@@ -5,7 +5,7 @@ export default (config = {}) => {
     let envConfig = (config.envs || {})[config.env] || {};
     delete config.envs;
     config = aliapp.mix(config, envConfig);
-    let isIDE = config.isIDE = my.isIDE;
+    let isIDE = (config.isIDE = my.isIDE);
 
     aliapp.init(config);
     let apifns = apis(config);
@@ -27,7 +27,8 @@ export default (config = {}) => {
         });
     }
 
-    return {
+
+    let spore = {
         config,
         util: {
             mix: aliapp.mix,
@@ -38,4 +39,29 @@ export default (config = {}) => {
         },
         ...apifns,
     };
+
+    spore.addAPI = function(module){
+        if(aliapp.type(module) != 'function'){
+            aliapp.warn('addAPI需要传入方法');
+        }else{
+            let re = module(spore);
+            if(aliapp.type(re) == 'object'){
+                //覆盖检查
+                let keys = Object.keys(spore);
+                let reKeys = Object.keys(re);
+                let conflictkeys = reKeys.filter(function(k) {
+                    return keys.indexOf(k) !== -1;
+                });
+                if(conflictkeys.length){
+                    console.warn("apis存在有覆盖情况："+conflictkeys.join(','))
+                }
+                return aliapp.mix(spore, re);
+            }else{
+                aliapp.warn('addAPI传入方法需要返回对象');
+            }
+        }
+        return spore;
+    };
+
+    return spore;
 };

@@ -167,8 +167,6 @@ const $splice = function(data, callback){
 };
 const linkData = function(e){
     let self = this;
-    
-    // console.log(e);
 
     if(e && e.currentTarget){
         let key = e.currentTarget.dataset.linkkey;
