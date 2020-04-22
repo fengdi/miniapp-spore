@@ -10,6 +10,8 @@
 
 将目录文件复制到项目`client/npm`下即可
 
+`npm i miniapp-spore -s`
+
 ## 初始化 ##
 
 `app.js`文件头部你需要加这两行代码，框架就开始运作了
