@@ -14,7 +14,7 @@
 
 `app.js`文件头部你需要加这两行代码，框架就开始运作了
 ```javascript
-import app from "./npm/app";
+import app from "miniapp-spore";
 let apis = app({
     env:'test'
 });
@@ -22,7 +22,7 @@ let apis = app({
 下面是完整的app.js文件示例
 
 ```javascript
-import app from "./npm/app";
+import app from "miniapp-spore";
 let apis = app({//config
   env:"test",    //当前环境 test | online ，切换环境这个字段必改，
   envs:{
@@ -230,9 +230,37 @@ Page({
 用法参考页面的linkData
 
 
-## 接口云函数库apis.js ##
+## 配置接口云函数库 ##
+在项目中建一个文件`api.js`(比如和`app.js`同级)
 
-**根据每个项目云函数，自行在apis.js内修改添加函数配置信息，在页面和组件内调用**
+
+```javascript
+//api.js
+export default (apis) => {
+    //apis.config 当前环境的配置
+    const { fn, f, fetchData, fetchMessage, config, dateFormat } = apis;
+    let myApis = {
+        //将业务云函数写这里
+        // 小程序入口
+        // async enter() {
+        //     //取data数据
+        //     return fetchData( await f("user.enter", {}) );
+        // },
+    }
+    return myApis;
+}
+```
+然后在`app.js`内引入`api.js`模块，调用方法addAPI将其加入到apis内进行一次初始化
+```javascript
+//app.js
+import myapi from "./api";
+
+//...这里省略“初始化”的代码
+
+apis.addAPI(myapi);//加入方法，这里做了简易的覆盖检查
+
+//在后面的代码就可以在apis对象使用myapi中的方法
+```
 
 根据前面在App初始化后，页面和组件可以获取到apis，
 apis内有常用的封装好的工具函数，也有需要提前自行配置好的云函数。
@@ -260,7 +288,7 @@ let res = await apis.f('user.enter', {foo:'bar'})
 使用方法，在axml模板中将其文件引入：
 ```xml
 <!-- 引入工具函数 -->
-<import-sjs name="util" from="../../npm/tpl-utils.sjs"></import-sjs>
+<import-sjs name="util" from="../../node_modules/miniapp-spore/tpl-utils.sjs"></import-sjs>
 
 <!-- 之后你就可以调用utils内部方法 -->
 {{util.json(foo)}}
@@ -270,6 +298,6 @@ let res = await apis.f('user.enter', {foo:'bar'})
 
 ## views视图历史组件 ##
 
-位置在 `npm/views` 里面有文档
+位置在 `miniapp-spore/views` 里面有文档
 
 
