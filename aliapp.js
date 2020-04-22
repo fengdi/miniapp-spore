@@ -231,9 +231,6 @@ const init = (option)=>{
         //注入函数名称
         config.injections = [["update", "updatePage"]].concat(config.injections || []);
         
-
-        //防抖名单
-        initThrottle(config);
         
         const onLoad = config.onLoad||function(){};
         config._setOldData = setOldData;
@@ -263,6 +260,9 @@ const init = (option)=>{
         config.merge = merge;
         config.$splice = $splice;
 
+        //防抖名单
+        initThrottle(config);
+
         systemPage(config);
     };
 
@@ -271,7 +271,7 @@ const init = (option)=>{
 
         const didMount = config.didMount || function(){};
 
-        initThrottle(config, true)
+        
 
         config.didMount = function(){
             let self = this;
@@ -315,6 +315,9 @@ const init = (option)=>{
         config.methods.$splice = $splice;
 
         config.methods.linkData = linkData;
+
+        //防抖名单
+        initThrottle(config, true)
 
         systemComponent(config);
     };

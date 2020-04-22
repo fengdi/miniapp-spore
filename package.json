@@ -1,0 +1,19 @@
+{
+  "name": "miniapp-spore",
+  "version": "0.3.0",
+  "description": "a tiny progressive enhancement framework of ali-miniapp.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/SporeTeam/miniapp-spore.git"
+  },
+  "keywords": [
+    "ali",
+    "miniapp"
+  ],
+  "author": "tangoboy",
+  "license": "MIT"
+}
