@@ -1,5 +1,5 @@
 import aliapp from "./aliapp";
-import apis from "./apis";
+import apis from "./apis.out";
 
 export default (config = {}) => {
     let envConfig = (config.envs || {})[config.env] || {};
@@ -27,7 +27,6 @@ export default (config = {}) => {
         });
     }
 
-
     let spore = {
         config,
         util: {
@@ -37,27 +36,29 @@ export default (config = {}) => {
             log: aliapp.log,
             warn: aliapp.warn,
         },
-        ...apifns,
     };
+    Object.assign(spore, apifns);
 
-    spore.addAPI = function(module){
-        if(aliapp.type(module) != 'function'){
-            aliapp.warn('addAPI需要传入方法');
-        }else{
+    spore.addAPI = function (module) {
+        if (aliapp.type(module) != "function") {
+            aliapp.warn("addAPI需要传入方法");
+        } else {
             let re = module(spore);
-            if(aliapp.type(re) == 'object'){
+            if (aliapp.type(re) == "object") {
                 //覆盖检查
                 let keys = Object.keys(spore);
                 let reKeys = Object.keys(re);
-                let conflictkeys = reKeys.filter(function(k) {
+                let conflictkeys = reKeys.filter(function (k) {
                     return keys.indexOf(k) !== -1;
                 });
-                if(conflictkeys.length){
-                    console.warn("apis存在有覆盖情况："+conflictkeys.join(','))
+                if (conflictkeys.length) {
+                    console.warn(
+                        "apis存在有覆盖情况：" + conflictkeys.join(",")
+                    );
                 }
                 return aliapp.mix(spore, re);
-            }else{
-                aliapp.warn('addAPI传入方法需要返回对象');
+            } else {
+                aliapp.warn("addAPI传入方法需要返回对象");
             }
         }
         return spore;

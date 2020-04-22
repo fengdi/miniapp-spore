@@ -1,0 +1,17 @@
+{
+    "presets": [
+        ["@babel/preset-env", {
+            // https://www.babeljs.cn/docs/babel-preset-env#targets
+            "targets": {
+			  "ie": "11",
+              "edge": "10",
+              "firefox": "60",
+              "chrome": "67",
+              "safari": "11.1"
+            }
+          }]
+    ],
+    
+    //去掉注释
+    "comments": false
+}
