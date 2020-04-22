@@ -191,6 +191,8 @@ export default (config) => {
         env,
         toast,
         toastError,
+        fetchData,
+        fetchMessage,
         dateFormat,
         randomByWeights,
         shuffle,
