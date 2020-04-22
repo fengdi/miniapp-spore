@@ -8,8 +8,6 @@
 
 ## 安装 ##
 
-将目录文件复制到项目`client/npm`下即可
-
 `npm i miniapp-spore -s`
 
 ## 初始化 ##
