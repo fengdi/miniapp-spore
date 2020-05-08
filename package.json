@@ -1,10 +1,10 @@
 {
   "name": "miniapp-spore",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "a tiny progressive enhancement framework of ali-miniapp.",
   "main": "app.js",
   "scripts": {
-		"build": "node_modules/.bin/babel apis.js -o apis.out.js",
+    "build": "node_modules/.bin/babel apis.js -o apis.out.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,11 +18,13 @@
   "author": "tangoboy",
   "license": "MIT",
   "dependencies": {
-    
+    "@babel/runtime": "^7.9.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.5"
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.5",
+    "babel-plugin-transform-runtime": "^6.23.0"
   }
 }
