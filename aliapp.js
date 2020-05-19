@@ -314,6 +314,18 @@ const init = (option)=>{
 
         config.methods.linkData = linkData;
 
+        // didPropsChange 生命周期
+        let didUpdate = config.didUpdate;
+        config.didUpdate = function(prevProps, prevData){
+            didUpdate && didUpdate.call(this, prevProps, prevData);
+            if(config.didPropsChange){
+                let d;
+                if(d = diff(this.props, prevProps)){
+                    config.didPropsChange.call(this, prevProps, d)
+                }
+            }
+        }
+
         //防抖名单
         initThrottle(config, true)
 
