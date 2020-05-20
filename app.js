@@ -35,6 +35,7 @@ export default (config = {}) => {
             type: aliapp.type,
             log: aliapp.log,
             warn: aliapp.warn,
+            diff: aliapp.diff
         },
     };
     Object.assign(spore, apifns);
