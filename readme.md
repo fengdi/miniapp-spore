@@ -213,6 +213,11 @@ Page({
 ### 方法防抖 `throttle :Object` ###
 配置组件中对应方法转化为防抖方法，相关防抖机制请百度
 
+### 生命周期 `didPropsChange(prevProps, diff)`  ###
+父组件/页面传入的props更新后触发，用于监听props改变，prevProps为变化前的props，diff为变化差异
+
+注：仅监听prop变化，setData update等方法更新data不会触发此生命周期
+
 ## 组件实例 `componentInstance` (在组件方法内的this) ##
 
 
@@ -300,4 +305,6 @@ let res = await apis.f('user.enter', {foo:'bar'})
 
 位置在 `miniapp-spore/views` 里面有文档
 
+## link链接跳转组件 ##
 
+位置在 `miniapp-spore/link` 里面有文档，用法类似html的a标记。
