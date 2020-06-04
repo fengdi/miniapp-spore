@@ -213,10 +213,13 @@ function updateComputed() {
 }
 
 
-const init = (option)=>{
-
-    isIDE = option.isIDE;
+const init = (option = {})=>{
+    
+    isIDE = my.isIDE;
     debug = 'debug'in option? option.debug : true;
+
+
+    log('Miniapp-spore has been initialized.');
 
     App = function(config){
 

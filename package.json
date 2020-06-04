@@ -1,12 +1,16 @@
 {
   "name": "miniapp-spore",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "a tiny progressive enhancement framework of ali-miniapp.",
-  "main": "app.js",
+  "main": "dist/miniapp-spore.js",
+  "source": "src/aliapp.js",
   "scripts": {
-    "build": "node_modules/.bin/babel apis.js -o apis.out.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "microbundle -f cjs",
+    "dev": "microbundle watch"
   },
+  "browserslist": [
+    "IE 11"
+  ],
   "repository": {
     "type": "git",
     "url": "https://gitee.com/SporeTeam/miniapp-spore.git"
@@ -15,16 +19,10 @@
     "ali",
     "miniapp"
   ],
-  "author": "tangoboy",
+  "author": "tangoboy <137757831@qq.com>",
   "license": "MIT",
-  "dependencies": {
-    "@babel/runtime": "^7.9.6"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/preset-env": "^7.9.5",
-    "babel-plugin-transform-runtime": "^6.23.0"
+    "microbundle": "^0.12.0"
   }
 }

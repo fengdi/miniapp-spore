@@ -15,47 +15,7 @@
 `app.js`文件头部你需要加这两行代码，框架就开始运作了
 ```javascript
 import app from "miniapp-spore";
-let apis = app({
-    env:'test'
-});
-```
-下面是完整的app.js文件示例
-
-```javascript
-import app from "miniapp-spore";
-let apis = app({//config
-  env:"test",    //当前环境 test | online ，切换环境这个字段必改，
-  envs:{
-    //根据上面env判断对应配置，并深度合并到config
-    "test":{
-        //测试环境的配置
-        appUrl:"https://m.duanqu.com?_ariver_appid=3000000003651171&nbsv=0.1.2004151741.2&nbsource=debug&nbsn=DEBUG",
-    },
-    "online":{
-        //正式环境的配置
-        appUrl:"https://m.duanqu.com?_ariver_appid=3000000003651171"
-    }
-  },
-  debug: false,//是否开启框架内的log调试信息
-  //其它配置信息
-  shop:{
-    shopId: "106564654",
-    sellerId:"1818112088",
-  },
-});
-
-//apis 是在 npm/apis.js 中配置的接口函数里面有 云函数 和 工具函数
-// apis.config 为配置信息（根据环境会自动切换）
-// 云函数也会根据环境自动切换 
-//apis可以放入到App配置中如：
-App({
-  apis,//页面和组件 可以获取  let apis = getApp().apis;
-  onLaunch(options) {
-  },
-  onShow(options) {
-  },
-  //...
-});
+app.init();
 ```
 
 
@@ -235,65 +195,11 @@ Page({
 用法参考页面的linkData
 
 
-## 配置接口云函数库 ##
-在项目中建一个文件`api.js`(比如和`app.js`同级)
-
-
-```javascript
-//api.js
-export default (apis) => {
-    //apis.config 当前环境的配置
-    const { fn, f, fetchData, fetchMessage, config, dateFormat } = apis;
-    let myApis = {
-        //将业务云函数写这里
-        // 小程序入口
-        // async enter() {
-        //     //取data数据
-        //     return fetchData( await f("user.enter", {}) );
-        // },
-    }
-    return myApis;
-}
-```
-然后在`app.js`内引入`api.js`模块，调用方法addAPI将其加入到apis内进行一次初始化
-```javascript
-//app.js
-import myapi from "./api";
-
-//...这里省略“初始化”的代码
-
-apis.addAPI(myapi);//加入方法，这里做了简易的覆盖检查
-
-//在后面的代码就可以在apis对象使用myapi中的方法
-```
-
-根据前面在App初始化后，页面和组件可以获取到apis，
-apis内有常用的封装好的工具函数，也有需要提前自行配置好的云函数。
-
-```javascript
-let apis = getApp().apis;
-
-//比如:
-
-//工具函数，支持跳转外链/页面
-apis.jump('https://m.taobao.com');
-
-//调用apis内配置好的云函数，可以统一处理好参数和返回值，页面组件重用
-let data = await apis.enter();
-
-//直接调用云函数 `云函数.函数名` 提交数据
-let res = await apis.f('user.enter', {foo:'bar'})
-//等同于 cloud.function.invoke('user', {foo:'bar'}, 'enter');
-
-```
-
-
-
 ## 模板JS工具函数 tpl-utils.sjs ##
 使用方法，在axml模板中将其文件引入：
 ```xml
 <!-- 引入工具函数 -->
-<import-sjs name="util" from="../../node_modules/miniapp-spore/tpl-utils.sjs"></import-sjs>
+<import-sjs name="util" from="miniapp-spore/tpl-utils.sjs"></import-sjs>
 
 <!-- 之后你就可以调用utils内部方法 -->
 {{util.json(foo)}}
