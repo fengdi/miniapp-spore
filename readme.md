@@ -34,7 +34,7 @@ import spore from "miniapp-spore";
 实例化的Store对象，小程序每个页面可以共用此store数据，注意namespace的唯一性，根据命名空间，数据初始化和更新都会自动同步到对应页面的data[namespace]下。
 
 ```javascript
-import spore from "miniapp-spore";
+import { Store } from "miniapp-spore";
 
 let store = new Store('$global', { count: 1024 })
 
@@ -51,7 +51,7 @@ let store = new Store('$global', { count: 1024 })
 更改数据与原生框架setData使用保持一致。更改后会自动触发（当前）页面数据更新，这里不要去修改页面的data.$global.count，不会去更新store的数据，也同时违背数据修改的一致性（只在同一个接口修改数据）。
 
 ```javascript
-import spore from "miniapp-spore";
+import { Store } from "miniapp-spore";
 
 let store = new Store('$global', { count: 1024 })
 
@@ -70,7 +70,7 @@ store.setData({
 
 app.js
 ```javascript
-import spore from "miniapp-spore";
+import { Store } from "miniapp-spore";
 
 let store = new Store('$global', { count: 1024 })
 
