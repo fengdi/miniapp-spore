@@ -4,6 +4,11 @@
 
 经过前面版本迭代和项目积累进行了重构，增加全局存储对象，精简去除不常用的特性，仍然坚持无感知、渐进增强和易用性。
 
+
+![](https://img.shields.io/npm/v/miniapp-spore?style=flat-square)
+![](https://img.shields.io/github/license/fengdi/miniapp-spore.svg?style=flat-square)
+![](https://img.badgesize.io/https:/unpkg.com/miniapp-spore?style=flat-square)
+
 ## 特性 ##
 
 
