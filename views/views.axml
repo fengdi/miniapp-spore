@@ -1,7 +1,0 @@
-
-<!-- <view>下面是路由视图</view>
-<view>
-path::{{path}}
-</view> -->
-
-<slot view="{{current}}" histroy="{{histroy}}" name="{{path}}"/>

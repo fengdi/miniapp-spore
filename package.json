@@ -1,9 +1,9 @@
 {
   "name": "miniapp-spore",
-  "version": "0.6.0",
+  "version": "2.0.0",
   "description": "a tiny progressive enhancement framework of ali-miniapp.",
   "main": "dist/miniapp-spore.js",
-  "source": "src/aliapp.js",
+  "source": "src/index.js",
   "scripts": {
     "build": "microbundle -f cjs",
     "dev": "microbundle watch"
@@ -17,10 +17,13 @@
   },
   "keywords": [
     "ali",
-    "miniapp"
+    "miniapp",
+    "alipay",
+    "阿里小程序",
+    "store"
   ],
   "author": "tangoboy <137757831@qq.com>",
-  "license": "MIT",
+  "license": "Apache 2.0",
   "dependencies": {},
   "devDependencies": {
     "microbundle": "^0.12.0"

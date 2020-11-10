@@ -1,6 +1,8 @@
 const ARRAYTYPE = '[object Array]'
 const OBJECTTYPE = '[object Object]'
 const FUNCTIONTYPE = '[object Function]'
+
+//thanks:
 //https://github.com/yisar/fard/blob/master/packages/fard/index.js
 //https://github.com/linjc/dd-store/blob/master/src/create.js
 //https://github.com/Tencent/westore/blob/master/packages/westore/utils/diff.js
