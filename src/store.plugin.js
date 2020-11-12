@@ -111,7 +111,7 @@ class Store{
     this.update(callback)
   }
   asyncSetData = asyncSetData
-
+  // 修改数组
   $spliceData(update, callback){
     if(type(update) != 'object'){
       return
@@ -130,7 +130,7 @@ class Store{
     this.emit('$spliceData', [update], this)
     this.update(callback)
   }
-
+  // 清除数据二级以下的计算属性可能会被覆盖
   clear(callback){
     Object.entries(this._defData).map(record=>{
       const [key, value] = record;
@@ -215,6 +215,21 @@ class Store{
       }
     }
     return res;
+  }
+  // 销毁
+  destroy(clear){
+    storesList.delete(this);
+    this._data = {};
+    this._defData = {};
+    if(clear){
+      this.clear();
+    }
+    ['$spliceData','setData','clear',
+    'asyncSetData','_setComputed',
+    'update','where','destroy'].forEach(fnName=>{
+      this[fnName] = ()=>{throw new Error(`Store:[${this.namespace}]已销毁`)}
+    })
+    this.emit('destroy', [], this)
   }
 }
 
