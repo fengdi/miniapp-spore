@@ -53,7 +53,7 @@ let store = new Store('$global', { count: 1024 })
 
 ### 全局数据更改 Store.prototype.setData(update, [callback]) ###
 
-更改数据与原生框架setData使用保持一致。更改后会自动触发（当前）页面数据更新，这里不要去修改页面的data.$global.count，这样修改不会更新store的数据，也同时违背数据修改的一致性（只在同一个接口修改数据），因此应该只能用store.setData修改数据。
+更改数据与原生框架setData使用保持一致。更改后会自动触发（当前）页面数据更新。
 
 ```javascript
 import { Store } from "miniapp-spore";
@@ -67,6 +67,23 @@ store.setData({
 
 ```
 
+除此之外，更新数组可以同样可以使用 `Store.prototype.$spliceData(update, [callback])` 方法
+```javascript
+//在 obj.arr 下的这个数组下标1后插入 'a','b','c'
+store.$spliceData({
+  'obj.arr': [1, 0, 'a','b','c']
+})
+```
+
+另外，提供了Promise版setData方法 `Store.prototype.asyncSetData(update)`
+```javascript
+await store.asyncSetData({
+  count: store.data.count + 1
+})
+//...等待设置生效后处理逻辑
+```
+
+这里不要去修改页面的data.$global.count，这样修改不会更新store的数据，也同时违背数据修改的一致性（只在同一个接口修改数据），因此应该只能在store实例的方法中修改数据。
 
 ### 在页面修改全局数据 ###
 

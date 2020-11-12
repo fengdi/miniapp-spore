@@ -107,11 +107,29 @@ class Store{
 
     this._data = deepCopy(this._defData);
 
-    this.emit('update', [update], this)
+    this.emit('setData', [update], this)
     this.update(callback)
   }
   asyncSetData = asyncSetData
 
+  $spliceData(update, callback){
+    if(type(update) != 'object'){
+      return
+    }
+    Object.entries(update).map(record=>{
+      const [key, value] = record;
+      let arr = getByPath(this._defData, key);
+
+      if(Array.isArray(arr)){
+        [].splice.apply(arr, value)
+      }
+    })
+
+    this._data = deepCopy(this._defData);
+
+    this.emit('$spliceData', [update], this)
+    this.update(callback)
+  }
 
   //处理计算属性
   _setComputed(){
