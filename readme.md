@@ -51,7 +51,7 @@ let store = new Store('$global', { count: 1024 })
 <!-- 1024 -->
 ```
 
-### 全局数据更改 ###
+### 全局数据更改 Store.prototype.setData(update, [callback]) ###
 
 更改数据与原生框架setData使用保持一致。更改后会自动触发（当前）页面数据更新，这里不要去修改页面的data.$global.count，这样修改不会更新store的数据，也同时违背数据修改的一致性（只在同一个接口修改数据），因此应该只能用store.setData修改数据。
 
@@ -171,14 +171,14 @@ let store = new Store("$store", { count: 1024 }, {
 
 ### 生命周期事件系统 ###
 
-对于App生命周期有：'onLaunch','onShow','onHide','onError','onShareAppMessage'
+对于App生命周期有：`onLaunch`,`onShow`,`onHide`,`onError`,`onShareAppMessage`
 
-对于Page生命周期有：'onLoad','onShow','onBack', 'onReady', 'onHide', 'onUnload', 
-  'onTitleClick', 'onPullDownRefresh', 'onReachBottom', 'onShareAppMessage',
-  'onOptionMenuClick', 'onPullIntercept', 'onTabItemTap', 'onPageScroll'
+对于Page生命周期有：`onLoad`,`onShow`,`onBack`, `onReady`, `onHide`, `onUnload`, 
+  `onTitleClick`, `onPullDownRefresh`, `onReachBottom`, `onShareAppMessage`,
+  `onOptionMenuClick`, `onPullIntercept`, `onTabItemTap`, `onPageScroll`
 （ 其中onBack是框架模拟的 ）
 
-对于Component生命周期有：'onInit', 'deriveDataFromProps', 'didMount', 'didUpdate', 'didUnmount', 'didPropsUpdate' （ 可能部分生命周期可能和Component2模式有关，其中didPropsUpdate是框架模拟的后面有使用说明 ）
+对于Component生命周期有：`onInit`, `deriveDataFromProps`, `didMount`, `didUpdate`, `didUnmount`, `didPropsUpdate` （ 可能部分生命周期可能和Component2模式有关，其中didPropsUpdate是框架模拟的后面有使用说明 ）
 
 （如果生命周期有遗漏欢迎提issue、pr）
 
@@ -208,7 +208,7 @@ on("Component.didMount:before", async function(){
 生命周期事件使用过程中需要注意，由于是先监听后触发，所以这些事件监听不应该放到任何一个生命周期内。
 
 
-### 组件属性变化监听 ###
+### 组件属性变化生命周期 ###
 
 小程序没有一个专门检测属性变化的机制。因此框架内提供了didPropsUpdate生命周期，仅在props变化时才会触发此生命周期。
 
@@ -239,7 +239,26 @@ Component({
 });
 ```
 
-### 插件机制 ###
+### 组件属性变化观察器 ###
+
+通过didPropsUpdate可以处理props变化，你还可以通过定义观察器来监听具体某个路径下的值变化。
+
+```javascript
+Component({
+  watchProps: {
+    'foo.a.b': (diff, prevProps)=>{
+      //foo.a.b变化时
+    },
+    'foo.cc': (diff, prevProps)=>{
+      //foo.cc变化时
+    }
+  },
+});
+```
+
+
+
+## 插件机制 ##
 
 使用插件通过use方法加载插件，可以自己开发插件在项目中灵活添加功能。
 
