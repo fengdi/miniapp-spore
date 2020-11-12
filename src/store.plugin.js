@@ -131,6 +131,16 @@ class Store{
     this.update(callback)
   }
 
+  clear(callback){
+    Object.entries(this._defData).map(record=>{
+      const [key, value] = record;
+      this._defData[key] =  null;
+    })
+    this._data = deepCopy(this._defData);
+    this.emit('clear', [], this)
+    this.update(callback)
+  }
+
   //处理计算属性
   _setComputed(){
     let self = this;
