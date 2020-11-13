@@ -67,19 +67,27 @@ const storesList = new Set();
 // 存储对象
 class Store{
   constructor(namespace='$store', data = {}, options = {}){
+
+    // 验证命名空间合法性
+    if(!/^[_\$a-zA-Z][_\$a-zA-Z0-9]*$/.test(namespace)){
+      throw new Error(`Store命名空间定义不合法，规则与js变量名一致`)
+      return;
+    }
+
     //内部存储的state
     this._defData = data;
 
+    // 融入事件方法 on emit 等
     Object.assign(this, Event(this._events = {}));
 
     this.options = Object.assign({diff:false}, options);
-    this.namespace = namespace;
 
+    this.namespace = namespace;
+    // 处理计算属性
     this._setComputed();
 
     //对外暴露的data
     this._data = deepCopy(this._defData);
-
 
     // 相同命名空间要报错
     if(!Array.from(storesList).find(store=>store.namespace == namespace)){
@@ -88,7 +96,7 @@ class Store{
       storesList.add(this);
 
     }else{
-      throw new Error(`不能同时使用同一个命名空间:${namespace}`)
+      throw new Error(`Store不能同时使用同一个命名空间:${namespace}`)
     }
   }
   // 不要直接访问 _data _defData 字段
@@ -100,7 +108,7 @@ class Store{
     if(type(update) != 'object'){
         return
     }
-
+    //更新数据根据路径进行设置
     Object.entries(update).map(record=>{
         setByPath(this._defData, record[0], record[1])
     })
@@ -110,6 +118,7 @@ class Store{
     this.emit('setData', [update], this)
     this.update(callback)
   }
+  // 异步设置data，返回Promise
   asyncSetData = asyncSetData
   // 修改数组
   $spliceData(update, callback){
@@ -149,6 +158,7 @@ class Store{
         const [path, computedFn] = computedCof;
 
         if(type(computedFn) == 'function'){
+          // 将对应路径下的对象设置getter
           if(!defByPath(this._defData, path, {
             enumerable: true,
             set() {
@@ -205,10 +215,15 @@ class Store{
     let page = spore.getPage();
     let res = [];
     if(page){
+
+      // 页面route加入结果
       res.push(page.route);
+      
       if(page._coms){
         page._coms.forEach(com=>{
           if(com.$stores && com.$stores.includes(this)){
+
+            // 组件is加入结果
             res.push(com.is);
           }
         });
@@ -224,6 +239,7 @@ class Store{
     if(clear){
       this.clear();
     }
+    // 成员方法全部置为报错的空方法
     ['$spliceData','setData','clear',
     'asyncSetData','_setComputed',
     'update','where','destroy'].forEach(fnName=>{
@@ -233,7 +249,7 @@ class Store{
   }
 }
 
-// 同步setData
+// 同步setData 支持页面/组件/Store
 let asyncSetData = function (data) {
     if (isComponent(this) || isPage(this) || isStore(this)) {
         return new Promise((r) => {
@@ -244,7 +260,7 @@ let asyncSetData = function (data) {
     }
 };
 
-// store存储与对应页面/组件data下数据对比出差异
+// store存储data与对应页面/组件data下数据对比出差异
 let storeDiff = function (data, namespace, instance){
   
   let diffUpdates = diff(data, instance.data[namespace]);
@@ -299,7 +315,7 @@ let isStore = (instance) =>{
           config.data[store.namespace] = {...store.data};
         })
 
-
+        // 组件支持asyncSetData方法
         config.methods.asyncSetData = asyncSetData;
       })
 
@@ -310,7 +326,7 @@ let isStore = (instance) =>{
           config.data[store.namespace] = {...store.data};
         })
 
-
+        // 页面支持asyncSetData方法
         config.asyncSetData = asyncSetData;
       })
 
