@@ -1,6 +1,8 @@
 
 import Event from "./event";
 
+import { version } from "../package.json";
+
 let spore = Event({});
 
 //polyfill
@@ -149,6 +151,6 @@ spore.plugins = plugins;
 spore.lifeCycles = lifeCycles;
 
 
-
+console && console.info(`miniapp-spore: v${version}`)
 
 export default spore;
