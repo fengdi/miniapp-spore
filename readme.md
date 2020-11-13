@@ -45,7 +45,7 @@ let store = new Store('$global', { count: 1024 })
 
 ```
 
-**所有的页面**axml模板可以共用此数据
+**所有页面** 的axml模板都可以共用此数据
 ```xml
 <view>{{$global.count}}</view>
 <!-- 1024 -->
@@ -153,7 +153,7 @@ coms/test/test.axml
 ### 计算属性 ###
 ```javascript
 //创建一个全局存储对象 isOdd属性是依赖count的，count变化会自动影响isOdd更新
-let store = new Store("$store", { count: 1024 }, {
+let store = new Store("$global", { count: 1024 }, {
   computed:{
     isOdd(){
       return this.count % 2;
