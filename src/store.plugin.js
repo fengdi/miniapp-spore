@@ -70,7 +70,7 @@ class Store{
 
     // 验证命名空间合法性
     if(!/^[_\$a-zA-Z][_\$a-zA-Z0-9]*$/.test(namespace)){
-      throw new Error(`Store命名空间定义不合法，规则与js变量名一致`)
+      throw new Error(`Store命名空间${namespace}定义不合法，规则与js变量名一致`)
       return;
     }
 
