@@ -1,6 +1,6 @@
 {
   "name": "miniapp-spore",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "a tiny progressive enhancement framework of ali-miniapp.",
   "main": "dist/miniapp-spore.js",
   "source": "src/index.js",
