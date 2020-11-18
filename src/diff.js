@@ -7,18 +7,18 @@ const FUNCTIONTYPE = '[object Function]'
 //https://github.com/linjc/dd-store/blob/master/src/create.js
 //https://github.com/Tencent/westore/blob/master/packages/westore/utils/diff.js
 
-function getType(obj) {
-  return Object.prototype.toString.call(obj)
+function type(obj) {
+    return Object.prototype.toString.call(obj)
 }
 
 function deepCopy(data) {
-  const type = getType(data)
-  if (type === OBJECTTYPE) {
+  const typeStr = type(data)
+  if (typeStr === OBJECTTYPE) {
     const obj = {}
     Object.keys(data).forEach(key => obj[key] = deepCopy(data[key]))
     return obj
   }
-  if (type === ARRAYTYPE) {
+  if (typeStr === ARRAYTYPE) {
     const arr = []
     data.forEach((item, index) => arr[index] = deepCopy(item))
     return arr
@@ -26,10 +26,7 @@ function deepCopy(data) {
   return data
 }
 
-//JSON.parse(JSON.stringify(current))//
-
 export default function diff(current, pre) {
-    current = deepCopy(current)
     const result = {}
     syncKeys(current, pre)
     _diff(current, pre, '', result)
@@ -125,6 +122,3 @@ function setResult(result, k, v) {
     }
 }
 
-function type(obj) {
-    return Object.prototype.toString.call(obj)
-}
