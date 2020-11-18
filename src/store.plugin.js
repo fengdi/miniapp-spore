@@ -73,21 +73,7 @@ class Store{
       throw new Error(`Store命名空间${namespace}定义不合法，规则与js变量名一致`)
       return;
     }
-
-    //内部存储的state
-    this._defData = data;
-
-    // 融入事件方法 on emit 等
-    Object.assign(this, Event(this._events = {}));
-
-    this.options = Object.assign({diff:false}, options);
-
     this.namespace = namespace;
-    // 处理计算属性
-    this._setComputed();
-
-    //对外暴露的data
-    this._data = deepCopy(this._defData);
 
     // 相同命名空间要报错
     if(!Array.from(storesList).find(store=>store.namespace == namespace)){
@@ -98,11 +84,17 @@ class Store{
     }else{
       throw new Error(`Store不能同时使用同一个命名空间:${namespace}`)
     }
+
+
+    // 融入事件方法 on emit 等
+    Object.assign(this, Event(this._events = {}));
+
+    this.options = Object.assign({diff:false}, options);
+
+    this._createDefineData(data);
+
   }
-  // 不要直接访问 _data _defData 字段
-  get data(){
-    return this._data;
-  }
+  
   //设置数据
   setData(update, callback){
     if(type(update) != 'object'){
@@ -110,10 +102,10 @@ class Store{
     }
     //更新数据根据路径进行设置
     Object.entries(update).map(record=>{
-        setByPath(this._defData, record[0], record[1])
+        setByPath(this._defineData, record[0], record[1])
     })
 
-    this._data = deepCopy(this._defData);
+    this._data = deepCopy(this._defineData);
 
     this.emit('setData', [update], this)
     this.update(callback)
@@ -127,29 +119,40 @@ class Store{
     }
     Object.entries(update).map(record=>{
       const [key, value] = record;
-      let arr = getByPath(this._defData, key);
+      let arr = getByPath(this._defineData, key);
 
       if(Array.isArray(arr)){
         [].splice.apply(arr, value)
       }
     })
 
-    this._data = deepCopy(this._defData);
+    this._data = deepCopy(this._defineData);
 
     this.emit('$spliceData', [update], this)
     this.update(callback)
   }
   // 清除数据二级以下的计算属性可能会被覆盖
   clear(callback){
-    Object.entries(this._defData).map(record=>{
+    Object.entries(this._defineData).map(record=>{
       const [key, value] = record;
-      this._defData[key] =  null;
+      this._defineData[key] =  null;
     })
-    this._data = deepCopy(this._defData);
+    this._data = deepCopy(this._defineData);
     this.emit('clear', [], this)
     this.update(callback)
   }
-
+  _createDefineData(data){
+    //内部定义存储的data
+    this._defineData = data;
+    // 处理计算属性
+    this._setComputed();
+    //对外暴露的data
+    this._data = deepCopy(this._defineData);
+  }
+  // 不要直接访问 _data _defineData 字段 访问data，此字段应该只读
+  get data(){
+    return this._data;
+  }
   //处理计算属性
   _setComputed(){
     let self = this;
@@ -159,13 +162,13 @@ class Store{
 
         if(type(computedFn) == 'function'){
           // 将对应路径下的对象设置getter
-          if(!defByPath(this._defData, path, {
+          if(!defByPath(this._defineData, path, {
             enumerable: true,
             set() {
               console.warn('计算属性不支持重新赋值')
             },
             get(){
-              return computedFn.bind(self._defData)();
+              return computedFn.bind(self._defineData)();
             }
           })){
             console.warn(`存储【${this.namespace}】无法定义计算属性${path}，因为在此路径下不是对象类型，无法定义属性。`)
@@ -235,7 +238,7 @@ class Store{
   destroy(clear){
     storesList.delete(this);
     this._data = {};
-    this._defData = {};
+    this._defineData = {};
     if(clear){
       this.clear();
     }
