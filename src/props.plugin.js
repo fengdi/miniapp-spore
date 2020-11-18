@@ -45,14 +45,26 @@ let isEmptyObject = (obj)=>{
       
       spore.on('Component.didUpdate:before', function(prevProps, prevData){
 
+        let { didPropsUpdate, watchProps } = this.$$config$$;
+
+        // 如果didPropsUpdate和watchProps都没有配置，就不做处理
+        if(!didPropsUpdate.origin && (!watchProps || isEmptyObject(watchProps)) ){
+          return ;
+        }
+
         let diffProps = diff(this.props, prevProps);
+
+
+        console.log("diff", diffProps)
+
          //不相等即diff为空对象时，触发didPropsUpdate 生命周期
         if (!isEmptyObject(diffProps)) {
 
-          //触发生命周期 didPropsUpdate
-          let didPropsUpdate = this.$$config$$.didPropsUpdate || function(){};
-          let watchProps = this.$$config$$.watchProps || {};
+          
+          didPropsUpdate = didPropsUpdate || function(){};
+          watchProps = watchProps || {};
 
+          //触发生命周期 didPropsUpdate
           didPropsUpdate.bind(this)(diffProps, prevProps);
 
           //配置的监听器
@@ -73,7 +85,6 @@ let isEmptyObject = (obj)=>{
               }
             }
           }
-
         }
 
       })
