@@ -78,7 +78,8 @@ let lifeCycles = {
 let listen = function(type, config){
   spore.emit(`${type}.init`, [config])
   lifeCycles[type].forEach(function(lifeCycle){
-    let fn = config[lifeCycle] || function(){};
+    let origin = config[lifeCycle];
+    let fn = origin || function(){};
 
     // lifeCycle AOP
     config[lifeCycle] = async function(){
@@ -86,6 +87,8 @@ let listen = function(type, config){
       await fn.apply(this, arguments);
       await spore.asyncEmit(`${type}.${lifeCycle}:after`, arguments, this)
     }
+    // 原定义的生命周期方法存入到现有生命周期的origin上方便获取
+    config[lifeCycle].origin = origin;
   })
   spore.emit(`${type}.inited`, [config])
 };
