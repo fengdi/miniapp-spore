@@ -54,9 +54,6 @@ let isEmptyObject = (obj)=>{
 
         let diffProps = diff(this.props, prevProps);
 
-
-        console.log("diff", diffProps)
-
          //不相等即diff为空对象时，触发didPropsUpdate 生命周期
         if (!isEmptyObject(diffProps)) {
 
