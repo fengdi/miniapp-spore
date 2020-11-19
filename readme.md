@@ -13,6 +13,7 @@
 
 
 - 全局存储对象
+- 极简化API，轻松上手
 - 页面onBack生命周期 （页面跳转后返回时触发）
 - 组件didPropsUpdate生命周期 （组件props更新时触发）
 - 组件props监听器
@@ -36,16 +37,17 @@ import spore from "miniapp-spore";
 
 ### 全局存储 new Store (namespace, data, [options]) ###
 
-实例化的Store对象，小程序每个页面可以共用此store数据，注意如果有多个Store对象应该保持namespace的唯一性，根据命名空间，数据初始化和更新都会自动同步到对应页面的data[namespace]下。
+实例化的Store对象，小程序每个页面可以共用此store数据，注意如果有多个Store对象应该保持namespace的唯一性，根据命名空间，数据初始化和更新都会自动同步到对应页面的`data[namespace]`下。
 
 ```javascript
+//在app.js下
 import { Store } from "miniapp-spore";
 
-let store = new Store('$global', { count: 1024 })
+new Store('$global', { count: 1024 })
 
 ```
 
-**所有页面** 的axml模板都可以共用此数据
+此时，**所有页面**的axml模板都可共用此`$global`数据
 ```xml
 <view>{{$global.count}}</view>
 <!-- 1024 -->
@@ -53,7 +55,7 @@ let store = new Store('$global', { count: 1024 })
 
 ### 全局数据更改 Store.prototype.setData(update, [callback]) ###
 
-更改数据与原生框架setData使用保持一致。更改后会自动触发（当前）页面数据更新。
+更改数据与原生框架中页面/组件的setData使用保持一致。更改后会自动触发所有页面数据更新。
 
 ```javascript
 import { Store } from "miniapp-spore";
@@ -65,6 +67,16 @@ store.setData({
 	count: store.data.count + 1
 })
 
+
+// 与原生页面和组件的setData一致：
+
+// 1. 直接修改store.data无效，无法改变页面/组件的状态，还会造成数据不一致。
+
+// 2. 请尽量避免一次设置过多的数据。
+
+// 3. setData接受一个对象作为参数。对象的键名key可以非常灵活，以数据路径的形式给出，如 array[2].message、a.b.c.d，并且不需要在store.data中预先定义。
+
+// 4. setData第二个参数为更新后触发的回调，在视图更新后可以拿到最新的data数据。
 ```
 
 除此之外，更新数组可以同样可以使用 `Store.prototype.$spliceData(update, [callback])` 方法
@@ -83,7 +95,8 @@ await store.asyncSetData({
 //...等待设置生效后处理逻辑
 ```
 
-这里不要去修改页面的data.$global.count，这样修改不会更新store的数据，也同时违背数据修改的一致性（只在同一个接口修改数据），因此应该只能在store实例的方法中修改数据。
+同样的，这里不要去修改页面的data.$global.count，这样修改不会更新store的数据，也同时违背数据修改的一致性（只在同一个接口修改数据），因此应该只在store实例的方法中修改数据。
+
 
 ### 在页面修改全局数据 ###
 
@@ -120,19 +133,21 @@ Page({
 
 ### 组件使用全局数据 ###
 
-在组件中，需要注意由于担心性能问题，是手动绑定存储，需要在组件中使用 stores 字段，数组类型。
+在组件中，由于担心性能问题，这里的机制是进行手动配置绑定存储，需要在组件中定义 stores 字段，数组类型。
 将存储对象的实例放入即可自动绑定此对象，没配置的不会自动生效。
 
-coms/test/test.js
+components/test/test.js
 
 ```javascript
 let store = getApp().store;
 
 Component({
+  // 新增可定义此stores字段
   stores: [
     store,
 	//... 支持多个store实例
   ],
+
   data: {},
   props: {},
   didMount() {
@@ -142,7 +157,7 @@ Component({
 
 ```
 
-配置了stores后就可以在**当前组件**axml模板可以使用此数据
+配置了stores后就可以在**此组件**axml模板中使用此数据。
 
 coms/test/test.axml
 ```xml
@@ -168,6 +183,17 @@ let store = new Store("$global", { count: 1024 }, {
 
 <!-- 1024 是否为奇数：0 -->
 ```
+
+### 数据强制更新 ###
+如果在某些生命周期中实例化Store后，可能没有更新页面/组件
+这时可以调用`Store.prototype.update([callback])`进行强制更新。
+
+```javascript
+store.update((data)=>{
+  //强制更新完成
+});
+```
+
 
 ### 性能更新方案 ###
 
@@ -197,9 +223,11 @@ let store = new Store("$store", { count: 1024 }, {
 
 对于Component生命周期有：`onInit`, `deriveDataFromProps`, `didMount`, `didUpdate`, `didUnmount`, `didPropsUpdate` （ 可能部分生命周期可能和Component2模式有关，其中didPropsUpdate是框架模拟的后面有使用说明 ）
 
-（如果生命周期有遗漏欢迎提issue、pr）
+*（如果生命周期有遗漏欢迎提issue、pr）*
 
-对于以上生命周期，在此框架内可以通过事件监听到对应生命周期。通过before、after来区分周期触发前还是触发后处理逻辑。参考示例：
+对于以上生命周期，在此框架内可以通过事件监听到对应生命周期。通过:before、:after来区分周期触发前还是触发后处理逻辑。
+
+参考示例：
 
 ```javascript
 import { Store, on } from "miniapp-spore";
@@ -222,7 +250,7 @@ on("Component.didMount:before", async function(){
 
 ```
 
-生命周期事件使用过程中需要注意，由于是先监听后触发，所以这些事件监听不应该放到任何一个生命周期内。
+生命周期事件使用过程中需要注意，由于是先监听后触发，所以这些事件监听通常不应该放到任何一个生命周期内，或者在触发前的生命周期中监听。
 
 
 ### 组件属性变化生命周期 ###
@@ -273,6 +301,10 @@ Component({
 });
 ```
 
+### 页面/组件 asyncSetData ###
+
+在页面或组件中，也可以直接使用asyncSetData方法代替当前页面/组件的setData。用法和Store的asyncSetData相同。
+
 
 
 ## 插件机制 ##
@@ -294,7 +326,7 @@ use(reduxPlugin);
 //redux.plugin.js
 export default function(spore, options){
 
-  // 定义方法
+  //闭包内 定义方法等逻辑
 
   return {
     install(){
