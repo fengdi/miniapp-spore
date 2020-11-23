@@ -322,6 +322,21 @@ let isStore = (instance) =>{
         config.methods.asyncSetData = asyncSetData;
       })
 
+      // 组件挂载时数据更新
+      spore.on('Component.didMount:before', async function(){
+        await Promise.all(this.$stores.map(store=>{
+          let data = store.data;
+          let update = {
+            [store.namespace] : data
+          };
+          // 组件diff更新
+          if(store.options.diff){
+            update = storeDiff(data, store.namespace, this)
+          }
+          return this.asyncSetData(update)
+        }));
+      })
+
       // 页面初始化嵌入数据
       spore.on('Page.init', function(config){
         config.data = config.data || {};
