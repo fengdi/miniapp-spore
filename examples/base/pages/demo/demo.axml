@@ -1,0 +1,23 @@
+<view>
+  当前demo页：count:{{$global.count}} 是否为奇数isOdd:{{$global.isOdd}}
+
+
+
+  <button type="primary" onTap="subtract">
+  减少count
+  </button>
+
+  <view style="margin-top:40rpx"/>
+
+
+  组件com1内容：
+  <view>
+    <com />
+  </view>
+
+
+  <view style="margin-top:40rpx"/>
+
+  修改完成后，<text style="background-color:#aaa;padding:4rpx;" onTap="back">返回到首页</text>试试
+
+</view>

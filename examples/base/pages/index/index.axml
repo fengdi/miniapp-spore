@@ -1,0 +1,16 @@
+<view>
+
+
+  当前首页：count:{{$global.count}}  是否为奇数isOdd:{{$global.isOdd}}
+
+  <button type="primary" onTap="add">
+  添加count
+  </button>
+
+
+  <view style="margin-top:40rpx;"></view>
+
+  <button type="primary" onTap="jump">
+    跳转到demo页
+  </button>
+</view>
