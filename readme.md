@@ -159,7 +159,7 @@ Component({
 
 配置了stores后就可以在**此组件**axml模板中使用此数据。
 
-coms/test/test.axml
+components/test/test.axml
 ```xml
 <view>{{$global.count}}</view>
 <!-- 1024 -->
