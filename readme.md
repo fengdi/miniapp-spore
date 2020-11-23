@@ -1,4 +1,4 @@
-# 阿里小程序渐进框架 miniapp-spore #
+# 🍭阿里小程序渐进框架 miniapp-spore #
 
 ## 前言 ##
 
@@ -337,3 +337,14 @@ export default function(spore, options){
   }
 }
 ```
+
+
+## 示例 ##
+
+
+- [全局count修改（基本使用示例）](https://gitee.com/SporeTeam/miniapp-spore/tree/2.x/examples/base)
+
+如果有好的建议欢迎 issue 讨论 🥰
+
+
+
