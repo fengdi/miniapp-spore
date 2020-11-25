@@ -1,4 +1,4 @@
-import { Store } from "E:\\miniApp\\miniapp-spore2\\npm\\miniapp-spore\\";
+import { Store } from "miniapp-spore";
 
 
 const store = new Store('$global', {
