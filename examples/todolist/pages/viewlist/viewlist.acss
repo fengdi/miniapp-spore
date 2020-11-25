@@ -1,0 +1,28 @@
+.h1{
+  text-align: center;
+  font-size: 79rpx;
+  font-weight: bold;
+}
+
+.todo-list{
+  text-align: center;
+  margin: 30rpx 0;
+}
+
+
+.item{
+  height: 50rpx;
+  line-height: 50rpx;
+  font-size: 34rpx;
+}
+
+.item.complete{
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.remove{
+  display: inline-block;
+  padding: 8rpx;
+  color: red;
+}

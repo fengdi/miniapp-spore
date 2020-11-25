@@ -1,0 +1,28 @@
+
+<view>
+
+  <view class="h1">TodoList</view>
+
+  <view class="todo-list">
+    <view class="item {{item.status ? '' : 'complete'}}" a:for="{{$global.todoList}}">
+      
+      <text onTap="switchStatus" data-index="{{index}}" >{{item.title}}</text>
+
+      <text onTap="remove" data-index="{{index}}" class="remove">×</text>
+    </view>
+  </view>
+
+  
+  
+  <view class="add-task">
+  新增任务:<input value="{{input}}" onInput="changeInput"/><text class="add-btn" onTap="add">添加</text>
+  </view>
+
+
+  <button class="view-btn" type="primary" onTap="view">
+    跳转到viewlist页面
+  </button>
+
+
+
+</view>

@@ -1,0 +1,15 @@
+<view>
+  
+  <view class="h1">查看todolist</view>
+
+  <view class="todo-list">
+    <view class="item {{item.status ? '' : 'complete'}}" a:for="{{$global.todoList}}">
+      
+      <text onTap="switchStatus" data-index="{{index}}" >{{item.title}}</text>
+
+      <text onTap="remove" data-index="{{index}}" class="remove">×</text>
+    </view>
+  </view>
+
+
+</view>
