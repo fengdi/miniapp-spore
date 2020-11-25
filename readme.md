@@ -343,6 +343,7 @@ export default function(spore, options){
 
 
 - [全局count修改（基本使用示例）](https://gitee.com/SporeTeam/miniapp-spore/tree/2.x/examples/base)
+- [todolist](https://gitee.com/SporeTeam/miniapp-spore/tree/2.x/examples/todolist)
 
 如果有好的建议欢迎 issue 讨论 🥰
 
