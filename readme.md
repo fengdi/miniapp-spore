@@ -291,14 +291,16 @@ Component({
 ```javascript
 Component({
   watchProps: {
-    'foo.a.b': (diff, prevProps)=>{
+    'foo.a.b': function(diff, prevProps){
       //foo.a.b变化时
     },
-    'foo.cc': (diff, prevProps)=>{
+    'foo.cc': function(diff, prevProps){
       //foo.cc变化时
     }
   },
 });
+
+//注：这里不能是箭头函数，否则this指向了watchProps对象
 ```
 
 ### 页面/组件 asyncSetData ###
