@@ -66,6 +66,13 @@ const storesList = new Set();
 
 // 存储对象
 class Store{
+
+  //public  data getter获取 _data
+  
+  //private _defineData 定义的数据
+
+  //private _data  暴露使用的数据
+
   constructor(namespace='$store', data = {}, options = {}){
 
     // 验证命名空间合法性
@@ -89,8 +96,12 @@ class Store{
     // 融入事件方法 on emit 等
     Object.assign(this, Event(this._events = {}));
 
+    // 融入用户定义的方法
+    Object.assign(this, options.actions || {});
+
     this.options = Object.assign({diff:false}, options);
 
+    // 将data先存入_defineData然后在复制到_data
     this._createDefineData(data);
 
   }
