@@ -19,6 +19,11 @@
 - 组件props监听器
 - 生命周期事件系统
 
+## Demo ##
+
+[https://herbox.online/p/109000020/app_IMXPoe87_](https://herbox.online/p/109000020/app_IMXPoe87_)
+
+
 ## 安装 ##
 
 `npm i miniapp-spore -s`
@@ -172,7 +177,7 @@ let store = new Store("$global", { count: 1024 }, {
   computed:{
     isOdd(){
       return this.count % 2;
-    },
+    }
   }
 });
 
@@ -182,6 +187,23 @@ let store = new Store("$global", { count: 1024 }, {
 <view>{{$global.count}} 是否为奇数：{{$global.isOdd}}</view>
 
 <!-- 1024 是否为奇数：0 -->
+```
+
+### 方法封装 ###
+为了方便数据维护管理，将常用的修改data逻辑进行封装，在业务代码中进行调用。
+
+```javascript
+//配置actions，方法会在融入到实例中
+let store = new Store("$global", { count: 1024 }, {
+  actions:{
+    add(){
+      this.setData({count: this.data.count+1})
+    }
+  }
+});
+
+
+store.add(); //页面/组件等具体业务逻辑中调用方法即可修改count
 ```
 
 ### 数据强制更新 ###
