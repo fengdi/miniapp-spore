@@ -28,6 +28,9 @@ function deepCopy(data) {
 
 export default function diff(current, pre) {
     const result = {}
+    if(type(current) == OBJECTTYPE){
+        current = deepCopy(current);
+    }
     syncKeys(current, pre)
     _diff(current, pre, '', result)
     return result
