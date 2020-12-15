@@ -33,7 +33,7 @@ const getByPath = function (data, path) {
   let p = Array.isArray(path) ? path : path.split(/\.|\[/);
   if (path && p.length) {
       let k = trimRightBracket(p.shift());
-      if (typeof data != "object" || !(k in data)) {
+      if (typeof data != "object" || !data || !(k in data)) {
           return;
       }
       return getByPath(data[k], p);
