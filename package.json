@@ -5,8 +5,8 @@
   "main": "dist/miniapp-spore.js",
   "source": "src/index.js",
   "scripts": {
-    "build": "microbundle -f cjs",
-    "dev": "microbundle watch"
+    "build": "node ./build/index.js -f cjs build",
+    "dev": "node ./build/index.js watch"
   },
   "browserslist": [
     "IE 11"

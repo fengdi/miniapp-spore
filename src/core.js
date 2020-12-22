@@ -1,9 +1,7 @@
 
 import Event from "./event";
-
-import { version } from "../package.json";
-
 let spore = Event({});
+let version = `${PACKAGE_VERSION}`;
 
 //polyfill
 if (!Object.entries){
