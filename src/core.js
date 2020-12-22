@@ -1,7 +1,11 @@
 
 import Event from "./event";
+import { lifeCycles } from "./platforms/index";
+import { version } from "../package.json";
 let spore = Event({});
-let version = `${PACKAGE_VERSION}`;
+// let version = `${PACKAGE_VERSION}`;
+
+console.log(lifeCycles)
 
 //polyfill
 if (!Object.entries){
@@ -63,14 +67,7 @@ Object.assign(spore, {
   Event
 })
 
-// 生命周期
-let lifeCycles = {
-  App:['onLaunch','onShow','onHide','onError','onShareAppMessage'],
-  Page:['onLoad','onShow','onBack', 'onReady', 'onHide', 'onUnload', 
-  'onTitleClick', 'onPullDownRefresh', 'onReachBottom', 'onShareAppMessage',
-  'onOptionMenuClick', 'onPullIntercept', 'onTabItemTap', 'onPageScroll'],
-  Component:['onInit', 'deriveDataFromProps', 'didMount', 'didUpdate', 'didUnmount']
-};
+
 
 // 事件监听
 let listen = function(type, config){
@@ -118,18 +115,21 @@ spore.on('Page.onShow:after', function(){
 let _App = App;
 let _Page = Page;
 let _Component = Component;
+
 App = function(config){
   listen('App', config);
   return _App(config);
 };
 App._App = _App;
 App.isApp = isApp;
+
 Page = function(config){
   listen('Page', config);
   return _Page(config);
 };
 Page._Page = _Page;
 Page.isPage = isPage;
+
 Component = function(config){
   listen('Component', config);
   return _Component(config);
