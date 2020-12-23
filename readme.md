@@ -1,8 +1,10 @@
-# 🍭阿里小程序渐进框架 miniapp-spore #
+# 🍭小程序渐进框架 miniapp-spore #
 
 ## 前言 ##
 
-经过前面版本迭代和项目积累进行了重构，增加全局存储对象，精简去除不常用的特性，仍然坚持无感知、渐进增强和易用性。
+原生方式开发小程序，经过前面版本迭代和项目积累进行了重构，增加全局存储对象，精简去除不常用的特性，仍然坚持无感知、渐进增强和易用性，基于事件和插件拓展。
+
+平台支持：微信小程序、支付宝小程序、淘宝小程序、钉钉小程序等。
 
 
 ![](https://img.shields.io/npm/v/miniapp-spore?style=flat-square)
@@ -11,12 +13,12 @@
 
 ## 特性 ##
 
-
+- 跨平台同时支持微信小程序和阿里小程序
 - 全局存储对象
 - 极简化API，轻松上手
 - 页面onBack生命周期 （页面跳转后返回时触发）
-- 组件didPropsUpdate生命周期 （组件props更新时触发）
-- 组件props监听器
+- 组件didPropsUpdate生命周期 （组件props更新时触发）（仅阿里小程序）
+- 组件props监听器（仅阿里小程序）
 - 生命周期事件系统
 
 ## Demo ##
@@ -236,6 +238,8 @@ let store = new Store("$store", { count: 1024 }, {
 
 ### 生命周期事件系统 ###
 
+#### 【阿里小程序的生命周期】 ####
+
 对于App生命周期有：`onLaunch`,`onShow`,`onHide`,`onError`,`onShareAppMessage`
 
 对于Page生命周期有：`onLoad`,`onShow`,`onBack`, `onReady`, `onHide`, `onUnload`, 
@@ -244,6 +248,19 @@ let store = new Store("$store", { count: 1024 }, {
 （ 其中onBack是框架模拟的 ）
 
 对于Component生命周期有：`onInit`, `deriveDataFromProps`, `didMount`, `didUpdate`, `didUnmount`, `didPropsUpdate` （ 可能部分生命周期可能和Component2模式有关，其中didPropsUpdate是框架模拟的后面有使用说明 ）
+
+
+#### 【微信小程序的生命周期】 ####
+
+对于App生命周期有：`onLaunch`,`onShow`,`onHide`,`onError`,`onPageNotFound`,`onUnhandledRejection`,`onThemeChange`
+
+对于Page生命周期有：`onLoad`,`onShow`,`onBack`, `onReady`, `onHide`, `onUnload`, `onPullDownRefresh`, `onReachBottom`, `onShareAppMessage`,
+  `onShareTimeline`, `onAddToFavorites`, `onPageScroll`, `onResize`,`onTabItemTap`
+（ 其中onBack是框架模拟的 ）
+
+对于Component生命周期有：`created`, `attached`, `ready`, `moved`, `detached`
+
+
 
 *（如果生命周期有遗漏欢迎提issue、pr）*
 
@@ -275,9 +292,9 @@ on("Component.didMount:before", async function(){
 生命周期事件使用过程中需要注意，由于是先监听后触发，所以这些事件监听通常不应该放到任何一个生命周期内，或者在触发前的生命周期中监听。
 
 
-### 组件属性变化生命周期 ###
+### 组件属性变化生命周期（仅阿里小程序） ###
 
-小程序没有一个专门检测属性变化的机制。因此框架内提供了didPropsUpdate生命周期，仅在props变化时才会触发此生命周期。
+微信小程序有observers监听器，而阿里小程序没有一个专门检测属性变化的机制。因此框架内为阿里小程序提供了didPropsUpdate生命周期，仅在props变化时才会触发此生命周期。
 
 通常我们在使用组件对组件传入属性时，属性的变化判断可能会用到didUpdate生命周期，对于简单值变化可以判断是否相等即可，但对于复杂对象结构就麻烦了。
 
@@ -306,7 +323,7 @@ Component({
 });
 ```
 
-### 组件属性变化观察器 ###
+### 组件属性变化观察器（仅阿里小程序） ###
 
 通过didPropsUpdate可以处理props变化，你还可以通过定义观察器来监听具体某个路径下的值变化。
 
@@ -368,6 +385,7 @@ export default function(spore, options){
 
 - [全局count修改（基本使用示例）](https://gitee.com/SporeTeam/miniapp-spore/tree/2.x/examples/base)
 - [todolist](https://gitee.com/SporeTeam/miniapp-spore/tree/2.x/examples/todolist)
+- [微信demo](https://gitee.com/SporeTeam/miniapp-spore/tree/2.x/examples/wx-base)
 
 如果有好的建议欢迎 issue 讨论 🥰
 

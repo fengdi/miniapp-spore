@@ -1,8 +1,7 @@
-import diff from "./diff";
+import diff from "../diff";
 
 
-
-
+// 全局存储插件
 export default function(spore, options){
 
 
@@ -201,15 +200,15 @@ class Store{
 
       // 页面diff更新
       if(this.options.diff){
-        update = storeDiff(data, this.namespace, page)
+        update = storeDiff(data, this.namespace, page);
       }
       // 页面更新
-      let updatePromises = [ asyncSetData.bind(page)(update) ]
+      let updatePromises = [ asyncSetData.bind(page)(update) ];
 
       if(page._coms){
         page._coms.forEach(com=>{
-          if(com.$stores && com.$stores.includes(this)){
-
+          let $stores = com.getStores();
+          if($stores && $stores.includes(this)){
             // 组件diff更新
             if(this.options.diff){
               update = storeDiff(data, this.namespace, com)
@@ -217,7 +216,7 @@ class Store{
             // 组件更新
             updatePromises.push( asyncSetData.bind(com)(update) )
           }
-        })
+        });
       }
 
       return Promise.all(updatePromises).then(()=>{ callback(data); return data;});
@@ -235,8 +234,8 @@ class Store{
       
       if(page._coms){
         page._coms.forEach(com=>{
-          if(com.$stores && com.$stores.includes(this)){
-
+          let $stores = com.getStores();
+          if($stores && $stores.includes(this)){
             // 组件is加入结果
             res.push(com.is);
           }
@@ -258,7 +257,7 @@ class Store{
     'asyncSetData','_setComputed',
     'update','where','destroy'].forEach(fnName=>{
       this[fnName] = ()=>{throw new Error(`Store:[${this.namespace}]已销毁`)}
-    })
+    });
     this.emit('destroy', [], this)
   }
 }
@@ -290,11 +289,25 @@ let storeDiff = function (data, namespace, instance){
 
 // 是否为Store类的实例
 let isStore = (instance) =>{
-  if(instance && instance instanceof Store){
-    return true
-  }
-  return false;
+  return instance && instance instanceof Store;
 }
+
+
+//生命周期别名，以阿里系为基准，微信对应为别名
+let ali = {
+  'Component.didMount': 'Component.didMount',
+  'Component.didUnmount' : 'Component.didUnmount',
+  'Page.onBack': 'Page.onBack',
+  'Page.onLoad': 'Page.onLoad',
+}
+let wx = {
+  'Component.didMount': 'Component.attached',
+  'Component.didUnmount' : 'Component.detached',
+  'Page.onBack': 'Page.onBack',
+  'Page.onLoad': 'Page.onLoad',
+};
+
+let lifeCyclesAlias = spore.isWx ? wx : ali;
 
 
 
@@ -305,18 +318,30 @@ let isStore = (instance) =>{
       
       Store.isStore = isStore;
 
+      // 页面组件实例存入 page._coms
+      spore.on( `${lifeCyclesAlias['Component.didMount']}:before`, function(){
+        this.$page = this.$page || spore.getPage();
+        this.$page._coms = this.$page._coms || new Set();
+        this.$page._coms.add(this);
+      });
+      spore.on(`${lifeCyclesAlias['Component.didUnmount']}:before`, function(){
+        this.$page = this.$page || spore.getPage();
+        this.$page._coms = this.$page._coms || new Set();
+        this.$page._coms.delete(this);
+      });
+
       // 页面返回时数据更新
-      spore.on('Page.onBack:before', function(){
+      spore.on(`${lifeCyclesAlias['Page.onBack']}:before`, function(){
         storesList.forEach(store=>{
           store.update()
         })
-      })
+      });
       // 页面加载时数据更新
-      spore.on('Page.onLoad:before', function(){
+      spore.on(`${lifeCyclesAlias['Page.onLoad']}:before`, function(){
         storesList.forEach(store=>{
           store.update()
         })
-      })
+      });
 
 
       // 组件初始化嵌入数据
@@ -324,18 +349,20 @@ let isStore = (instance) =>{
         config.data = config.data || {};
         config.stores = config.stores || [];
         config.methods = config.methods || {};
-        config.methods.$stores = config.stores; //$stores需要在组件方法内定义才能取到值
-        config.methods.$stores.forEach(store=>{
+        config.methods.getStores = function(){ //$stores需要在组件方法内定义才能取到值
+          return config.stores;
+        };
+        config.stores.forEach(store=>{
           config.data[store.namespace] = {...store.data};
-        })
+        });
 
         // 组件支持asyncSetData方法
         config.methods.asyncSetData = asyncSetData;
       })
 
       // 组件挂载时数据更新
-      spore.on('Component.didMount:before', async function(){
-        await Promise.all(this.$stores.map(store=>{
+      spore.on( `${lifeCyclesAlias['Component.didMount']}:before`, async function(){
+        await Promise.all((this.getStores()||[]).map(store=>{
           let data = store.data;
           let update = {
             [store.namespace] : data
@@ -353,18 +380,18 @@ let isStore = (instance) =>{
         config.data = config.data || {};
         storesList.forEach(store=>{
           config.data[store.namespace] = {...store.data};
-        })
+        });
 
         // 页面支持asyncSetData方法
         config.asyncSetData = asyncSetData;
-      })
+      });
 
 
       Object.assign(spore, {
         Store,
         asyncSetData,
         isStore
-      })
+      });
 
 
     }

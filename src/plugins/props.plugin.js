@@ -1,4 +1,4 @@
-import diff from "./diff";
+import diff from "../diff";
 
 export default function(spore, options){
 

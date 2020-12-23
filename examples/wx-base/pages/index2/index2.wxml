@@ -1,0 +1,13 @@
+<view class="page-2">
+
+<view class="count">
+count: {{$store.count}}
+</view>
+
+<button bindtap="add5">增加add +5</button>
+
+<test></test>
+
+<button type="primary" bindtap="back">返回到页面1</button>
+
+</view>

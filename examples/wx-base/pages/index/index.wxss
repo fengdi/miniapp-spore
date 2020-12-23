@@ -1,0 +1,10 @@
+.title {
+  padding: 60rpx;
+  text-align: center;
+  font-size: 72rpx;
+}
+
+.title text{
+  color: blue;
+  padding: 0 15rpx;
+}
