@@ -1,0 +1,4 @@
+<!--coms/test.wxml-->
+<!-- <text>coms/test.wxml</text> -->
+
+<text>{{$store.count}}</text>

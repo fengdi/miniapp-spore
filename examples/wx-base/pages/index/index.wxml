@@ -1,0 +1,19 @@
+<!--index.wxml-->
+<view class="page-1">
+
+  <view class="title">
+    <view>Hello miniapp-spore 😆 !</view> 
+    <text>{{$store.count}}</text>
+    isOdd<text>{{$store.isOdd}}</text>
+  </view>
+  
+  <test></test>
+
+  <button bindtap="add">增加add</button>
+  <button bindtap="decrease">减少decrease</button>
+
+
+
+  <button type="primary" style="margin-top:70rpx;" bindtap="jump">跳转到页面2</button>
+
+</view>
