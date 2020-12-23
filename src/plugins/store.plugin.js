@@ -208,9 +208,7 @@ class Store{
       if(page._coms){
         page._coms.forEach(com=>{
           let $stores = com.getStores();
-          console.log("getStores", $stores)
           if($stores && $stores.includes(this)){
-
             // 组件diff更新
             if(this.options.diff){
               update = storeDiff(data, this.namespace, com)
@@ -266,10 +264,7 @@ class Store{
 
 // 同步setData 支持页面/组件/Store
 let asyncSetData = function (data) {
-  console.log("asyncSetData", data);
-  console.log("isComponent:", isComponent(this), this)
     if (isComponent(this) || isPage(this) || isStore(this)) {
-        
         return new Promise((r) => {
             this.setData(data, (data) => {
                 r(data);
@@ -367,7 +362,6 @@ let lifeCyclesAlias = spore.isWx ? wx : ali;
 
       // 组件挂载时数据更新
       spore.on( `${lifeCyclesAlias['Component.didMount']}:before`, async function(){
-        console.log("组件加载", this)
         await Promise.all((this.getStores()||[]).map(store=>{
           let data = store.data;
           let update = {
