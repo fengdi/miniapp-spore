@@ -7,7 +7,9 @@ spore.use(onBackPlugin);
 
 spore.use(storePlugin);
 
-spore.use(propsPlugin);
+if(spore.isMy){
+  spore.use(propsPlugin);
+}
 
 
 export default spore;

@@ -2,10 +2,9 @@
 import Event from "./event";
 import { lifeCycles, isMy, isWx } from "./platforms/index";
 import { version } from "../package.json";
-let spore = Event({});
+let spore = Event();
 // let version = `${PACKAGE_VERSION}`;
 
-console.log("lifeCycles", lifeCycles)
 
 //polyfill
 if (!Object.entries){
@@ -35,7 +34,7 @@ let isPage = (instance) => {
 };
 // 是否为组件
 let isComponent = (instance) => {
-  return instance && type(instance) == "object" && '__type__' in instance && instance.__type__ == 'Component';
+  return instance && type(instance) == "object" && !isPage(instance) && instance.is;
 };
 // 是否为App
 let isApp = (instance) => {
@@ -50,8 +49,9 @@ Object.assign(spore, {
   isMy,
   isWx,
   getPage,
-  Event
-})
+  Event,
+  version
+});
 
 
 

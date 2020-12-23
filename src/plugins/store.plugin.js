@@ -1,7 +1,7 @@
 import diff from "../diff";
 
 
-
+// 全局存储插件
 export default function(spore, options){
 
 
@@ -207,7 +207,9 @@ class Store{
 
       if(page._coms){
         page._coms.forEach(com=>{
-          if(com.$stores && com.$stores.includes(this)){
+          let $stores = com.getStores();
+          console.log("getStores", $stores)
+          if($stores && $stores.includes(this)){
 
             // 组件diff更新
             if(this.options.diff){
@@ -234,8 +236,8 @@ class Store{
       
       if(page._coms){
         page._coms.forEach(com=>{
-          if(com.$stores && com.$stores.includes(this)){
-
+          let $stores = com.getStores();
+          if($stores && $stores.includes(this)){
             // 组件is加入结果
             res.push(com.is);
           }
@@ -264,7 +266,10 @@ class Store{
 
 // 同步setData 支持页面/组件/Store
 let asyncSetData = function (data) {
+  console.log("asyncSetData", data);
+  console.log("isComponent:", isComponent(this), this)
     if (isComponent(this) || isPage(this) || isStore(this)) {
+        
         return new Promise((r) => {
             this.setData(data, (data) => {
                 r(data);
@@ -293,6 +298,23 @@ let isStore = (instance) =>{
 }
 
 
+//生命周期别名，以阿里系为基准，微信对应为别名
+let ali = {
+  'Component.didMount': 'Component.didMount',
+  'Component.didUnmount' : 'Component.didUnmount',
+  'Page.onBack': 'Page.onBack',
+  'Page.onLoad': 'Page.onLoad',
+}
+let wx = {
+  'Component.didMount': 'Component.attached',
+  'Component.didUnmount' : 'Component.detached',
+  'Page.onBack': 'Page.onBack',
+  'Page.onLoad': 'Page.onLoad',
+};
+
+let lifeCyclesAlias = spore.isWx ? wx : ali;
+
+
 
   return {
 
@@ -302,23 +324,25 @@ let isStore = (instance) =>{
       Store.isStore = isStore;
 
       // 页面组件实例存入 page._coms
-      spore.on('Component.didMount:before', function(){
+      spore.on( `${lifeCyclesAlias['Component.didMount']}:before`, function(){
+        this.$page = this.$page || spore.getPage();
         this.$page._coms = this.$page._coms || new Set();
         this.$page._coms.add(this);
       });
-      spore.on('Component.didUnmount:before', function(){
+      spore.on(`${lifeCyclesAlias['Component.didUnmount']}:before`, function(){
+        this.$page = this.$page || spore.getPage();
         this.$page._coms = this.$page._coms || new Set();
         this.$page._coms.delete(this);
       });
 
       // 页面返回时数据更新
-      spore.on('Page.onBack:before', function(){
+      spore.on(`${lifeCyclesAlias['Page.onBack']}:before`, function(){
         storesList.forEach(store=>{
           store.update()
         })
       });
       // 页面加载时数据更新
-      spore.on('Page.onLoad:before', function(){
+      spore.on(`${lifeCyclesAlias['Page.onLoad']}:before`, function(){
         storesList.forEach(store=>{
           store.update()
         })
@@ -330,8 +354,10 @@ let isStore = (instance) =>{
         config.data = config.data || {};
         config.stores = config.stores || [];
         config.methods = config.methods || {};
-        config.methods.$stores = config.stores; //$stores需要在组件方法内定义才能取到值
-        config.methods.$stores.forEach(store=>{
+        config.methods.getStores = function(){ //$stores需要在组件方法内定义才能取到值
+          return config.stores;
+        };
+        config.stores.forEach(store=>{
           config.data[store.namespace] = {...store.data};
         });
 
@@ -340,8 +366,9 @@ let isStore = (instance) =>{
       })
 
       // 组件挂载时数据更新
-      spore.on('Component.didMount:before', async function(){
-        await Promise.all(this.$stores.map(store=>{
+      spore.on( `${lifeCyclesAlias['Component.didMount']}:before`, async function(){
+        console.log("组件加载", this)
+        await Promise.all((this.getStores()||[]).map(store=>{
           let data = store.data;
           let update = {
             [store.namespace] : data
