@@ -1,4 +1,4 @@
-import diff from "./diff";
+import diff from "../diff";
 
 
 
@@ -200,10 +200,10 @@ class Store{
 
       // 页面diff更新
       if(this.options.diff){
-        update = storeDiff(data, this.namespace, page)
+        update = storeDiff(data, this.namespace, page);
       }
       // 页面更新
-      let updatePromises = [ asyncSetData.bind(page)(update) ]
+      let updatePromises = [ asyncSetData.bind(page)(update) ];
 
       if(page._coms){
         page._coms.forEach(com=>{
@@ -216,7 +216,7 @@ class Store{
             // 组件更新
             updatePromises.push( asyncSetData.bind(com)(update) )
           }
-        })
+        });
       }
 
       return Promise.all(updatePromises).then(()=>{ callback(data); return data;});
@@ -257,7 +257,7 @@ class Store{
     'asyncSetData','_setComputed',
     'update','where','destroy'].forEach(fnName=>{
       this[fnName] = ()=>{throw new Error(`Store:[${this.namespace}]已销毁`)}
-    })
+    });
     this.emit('destroy', [], this)
   }
 }
@@ -289,10 +289,7 @@ let storeDiff = function (data, namespace, instance){
 
 // 是否为Store类的实例
 let isStore = (instance) =>{
-  if(instance && instance instanceof Store){
-    return true
-  }
-  return false;
+  return instance && instance instanceof Store;
 }
 
 
@@ -304,18 +301,28 @@ let isStore = (instance) =>{
       
       Store.isStore = isStore;
 
+      // 页面组件实例存入 page._coms
+      spore.on('Component.didMount:before', function(){
+        this.$page._coms = this.$page._coms || new Set();
+        this.$page._coms.add(this);
+      });
+      spore.on('Component.didUnmount:before', function(){
+        this.$page._coms = this.$page._coms || new Set();
+        this.$page._coms.delete(this);
+      });
+
       // 页面返回时数据更新
       spore.on('Page.onBack:before', function(){
         storesList.forEach(store=>{
           store.update()
         })
-      })
+      });
       // 页面加载时数据更新
       spore.on('Page.onLoad:before', function(){
         storesList.forEach(store=>{
           store.update()
         })
-      })
+      });
 
 
       // 组件初始化嵌入数据
@@ -326,7 +333,7 @@ let isStore = (instance) =>{
         config.methods.$stores = config.stores; //$stores需要在组件方法内定义才能取到值
         config.methods.$stores.forEach(store=>{
           config.data[store.namespace] = {...store.data};
-        })
+        });
 
         // 组件支持asyncSetData方法
         config.methods.asyncSetData = asyncSetData;
@@ -352,18 +359,18 @@ let isStore = (instance) =>{
         config.data = config.data || {};
         storesList.forEach(store=>{
           config.data[store.namespace] = {...store.data};
-        })
+        });
 
         // 页面支持asyncSetData方法
         config.asyncSetData = asyncSetData;
-      })
+      });
 
 
       Object.assign(spore, {
         Store,
         asyncSetData,
         isStore
-      })
+      });
 
 
     }

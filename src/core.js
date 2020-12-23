@@ -1,11 +1,11 @@
 
 import Event from "./event";
-import { lifeCycles } from "./platforms/index";
+import { lifeCycles, isMy, isWx } from "./platforms/index";
 import { version } from "../package.json";
 let spore = Event({});
 // let version = `${PACKAGE_VERSION}`;
 
-console.log(lifeCycles)
+console.log("lifeCycles", lifeCycles)
 
 //polyfill
 if (!Object.entries){
@@ -31,31 +31,15 @@ let getPage = ()=> {
 }
 // 是否为页面
 let isPage = (instance) => {
-    if (type(instance) == "object") {
-        return "$viewId" in instance && "route" in instance;
-    } else {
-        return false;
-    }
+  return instance && type(instance) == "object" && '__type__' in instance && instance.__type__ == 'Page';
 };
 // 是否为组件
 let isComponent = (instance) => {
-    if (type(instance) == "object") {
-        return (
-            "is" in instance &&
-            "$page" in instance &&
-            "props" in instance
-        );
-    } else {
-        return false;
-    }
+  return instance && type(instance) == "object" && '__type__' in instance && instance.__type__ == 'Component';
 };
 // 是否为App
 let isApp = (instance) => {
-    if (type(instance) == "object") {
-        return instance == getApp();
-    } else {
-        return false;
-    }
+  return instance == getApp();
 };
 
 Object.assign(spore, {
@@ -63,6 +47,8 @@ Object.assign(spore, {
   isPage,
   isComponent,
   isApp,
+  isMy,
+  isWx,
   getPage,
   Event
 })
@@ -88,27 +74,7 @@ let listen = function(type, config){
   spore.emit(`${type}.inited`, [config])
 };
 
-// 页面组件实例存入 page._coms
-spore.on('Component.didMount:before', function(){
-  this.$page._coms = this.$page._coms || new Set();
-  this.$page._coms.add(this);
-})
-spore.on('Component.didUnmount:before', function(){
-  this.$page._coms = this.$page._coms || new Set();
-  this.$page._coms.delete(this);
-})
-// 已加载
-spore.on('Page.onLoad:before', function(){
-  setTimeout(() => {
-    this._loaded = true;
-  }, 10);
-})
-// 页面返回生命周期
-spore.on('Page.onShow:after', function(){
-  if(this._loaded){
-    this.onBack();
-  }
-})
+
 
 
 // Hooks
@@ -118,6 +84,7 @@ let _Component = Component;
 
 App = function(config){
   listen('App', config);
+  config.__type__ = 'App';
   return _App(config);
 };
 App._App = _App;
@@ -125,6 +92,7 @@ App.isApp = isApp;
 
 Page = function(config){
   listen('Page', config);
+  config.__type__ = 'Page';
   return _Page(config);
 };
 Page._Page = _Page;
@@ -132,6 +100,7 @@ Page.isPage = isPage;
 
 Component = function(config){
   listen('Component', config);
+  config.__type__ = 'Component';
   return _Component(config);
 };
 Component._Component = _Component;

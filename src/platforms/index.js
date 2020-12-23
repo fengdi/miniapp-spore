@@ -1,8 +1,8 @@
 import aliLC from  "./aliLifeCycles";
 import wxLC  from "./wxLifeCycles";
 
-const isWx = (typeof wx === 'object') && (typeof wx.getSystemInfoSync === 'function');
-const isMy = (typeof my === 'object') && (typeof my.getSystemInfoSync === 'function');
+export const isWx = (typeof wx === 'object') && (typeof wx.getSystemInfoSync === 'function');
+export const isMy = (typeof my === 'object') && (typeof my.getSystemInfoSync === 'function');
 
 // 生命周期
 let autolifeCycles;
